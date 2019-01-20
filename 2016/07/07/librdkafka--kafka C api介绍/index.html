@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="用到的更新：2017年11月08日07:23:09">
+<meta name="keywords" content="c,kafka">
+<meta property="og:type" content="article">
+<meta property="og:title" content="librdkafka--kafka C api介绍">
+<meta property="og:url" content="http://suntus.github.io/2016/07/07/librdkafka--kafka C api介绍/index.html">
+<meta property="og:site_name" content="Morning~Sun。">
+<meta property="og:description" content="用到的更新：2017年11月08日07:23:09">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-12-04T07:58:41.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="librdkafka--kafka C api介绍">
+<meta name="twitter:description" content="用到的更新：2017年11月08日07:23:09">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Morning~Sun。" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://suntus.github.io/2016/07/07/librdkafka--kafka C api介绍/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>librdkafka--kafka C api介绍 | Morning~Sun。</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-55322469-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-55322469-1');
+  </script>
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Morning~Sun。</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">ha</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://suntus.github.io/2016/07/07/librdkafka--kafka C api介绍/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="suntus">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Morning~Sun。">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">librdkafka--kafka C api介绍
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: Jul 7th Thu 2016 17:29 17:29:01" itemprop="dateCreated datePublished" datetime="2016-07-07T17:29:01+08:00">Jul 7th Thu 2016 17:29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: Dec 4th Mon 2017 15:58 15:58:41" itemprop="dateModified" datetime="2017-12-04T15:58:41+08:00">Dec 4th Mon 2017 15:58</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <a href="/2016/07/07/librdkafka--kafka C api介绍/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">Comments: </span> <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/07/07/librdkafka--kafka C api介绍/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>用到的<br><em>更新：2017年11月08日07:23:09</em><br><a id="more"></a></p>
+<h2 id="0-总结"><a href="#0-总结" class="headerlink" title="0. 总结"></a>0. 总结</h2><p>支持</p>
+<ul>
+<li>High-level producer</li>
+<li>High-level consumer</li>
+<li>Simple (Low-level) consumer</li>
+<li>压缩：snappy, gzip, lz4</li>
+<li>SSL</li>
+<li>SASL</li>
+</ul>
+<p>　　consumer有两套API，高级(high-level)和简单(simple)的，取名叫<code>简单的</code>其实不是很准确，应该叫底层API或者低级API，它跟高级API的区别是没有自动负载均衡，而高级API会自动进行负载均衡–当然底层的适合折腾。我下边就直接叫高级和低级API了。</p>
+<hr>
+<p>kafka的 C 客户端主要用途就是发数据收数据，为了收发数据就有了</p>
+<ul>
+<li>producer</li>
+<li>consumer</li>
+</ul>
+<p>发数据(producer干的活儿)比较好办，可以选择发一条和发多条：<br><figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 发一条</span></span><br><span class="line">rd_kafka_produce<span class="comment">()</span>;</span><br><span class="line"><span class="comment">// 发多条</span></span><br><span class="line">rd_kafka_produce_batch<span class="comment">()</span>;</span><br></pre></td></tr></table></figure></p>
+<p>收数据(consumer干的活儿)的选择比较多:<br><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// 高级API</span><br><span class="line"><span class="attribute">msg</span> = rd_kafka_consumer_poll()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">// 低级API</span><br><span class="line">// 一次收一条</span><br><span class="line"><span class="attribute">msg</span> = rd_kafka_consume()<span class="comment">;</span></span><br><span class="line">// 一次收多条</span><br><span class="line"><span class="attribute">msg</span> = rd_kafka_consume_batch()<span class="comment">;</span></span><br><span class="line">// 使用回调处理收到的msg，速度最快了</span><br><span class="line">rd_kafka_consume_callback()<span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
+<p>收发数据之前至少要先有个统一的句柄，好让kafka内部准备好连接brokers集群、建立内部使用的各项结构之类的工作：<br><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 建立producer或者consumer都用这个</span><br><span class="line"><span class="attribute">rd</span> = rd_kafka_new()<span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
+<p>建立的这个kafka句柄要知道连到哪个broker：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 运行时动态添加brokers</span></span><br><span class="line">rd_kafka_brokers_add();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用配置项添加brokers</span></span><br><span class="line">rd_kafka_conf_set(conf, <span class="string">"metadata.broker.list"</span>,brokers, errstr, <span class="keyword">sizeof</span>(errstr);</span><br></pre></td></tr></table></figure></p>
+<p>发布消息用<code>rd_kafka_topic_t</code>；订阅消息有两套，一套对应高级API:<code>rd_kafka_topic_partition_list_t</code>,一套对应低级API：<code>rd_kafka_topic_t</code>(跟producer用的一样)<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 对rd_kafka_topic_partition_list_t结构的操作</span></span><br><span class="line"><span class="comment">// 创建</span></span><br><span class="line">rd_kafka_topic_partition_list_new();</span><br><span class="line"><span class="comment">// 增加元素</span></span><br><span class="line">rd_kafka_topic_partition_list_add();</span><br><span class="line"><span class="comment">// 删除元素</span></span><br><span class="line">rd_kafka_topic_partition_list_del();</span><br><span class="line"><span class="comment">// 查找元素</span></span><br><span class="line">rd_kafka_topic_partition_list_find();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 对rd_kafka_topic_t的操作</span></span><br><span class="line"><span class="comment">// 创建</span></span><br><span class="line">rd_kafka_topic_new();</span><br><span class="line"><span class="comment">// 删除</span></span><br><span class="line">rd_kafka_topic_destroy();</span><br><span class="line"><span class="comment">// 获取该topic的名字</span></span><br><span class="line">rd_kafka_topic_name();</span><br><span class="line"><span class="comment">// 获取该topic传入的应用参数</span></span><br><span class="line">rd_kafka_topic_opaque();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用rd_kafka_topic_partition_list_t的时候，topic+partition是连在一起的，</span></span><br><span class="line"><span class="comment">// 所以给kafka句柄的时候只用一个参数就够了</span></span><br><span class="line"><span class="comment">// 订阅消息</span></span><br><span class="line">rd_kafka_subscribe (<span class="keyword">rd_kafka_t</span> *rk,</span><br><span class="line">                            <span class="keyword">const</span> <span class="keyword">rd_kafka_topic_partition_list_t</span> *topics);</span><br><span class="line"><span class="comment">// 指定消费的partition，可以在运行时更换</span></span><br><span class="line">rd_kafka_assign (<span class="keyword">rd_kafka_t</span> *rk,</span><br><span class="line">                            <span class="keyword">const</span> <span class="keyword">rd_kafka_topic_partition_list_t</span> *partitions);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 用rd_kafka_topic_t比较麻烦，需要配合一个partition才行</span></span><br><span class="line"><span class="comment">// 直接启动consumer了</span></span><br><span class="line">rd_kafka_consume_start(<span class="keyword">rd_kafka_topic_t</span> *rkt, <span class="keyword">int32_t</span> partition,</span><br><span class="line">                            <span class="keyword">int64_t</span> offset);</span><br><span class="line"><span class="comment">// 每次接收也要带上partition</span></span><br><span class="line"><span class="keyword">rd_kafka_message_t</span> *rd_kafka_consume(<span class="keyword">rd_kafka_topic_t</span> *rkt, <span class="keyword">int32_t</span> partition,</span><br><span class="line">                            <span class="keyword">int</span> timeout_ms);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 发送的时候使用 rd_kafka_topic_t</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd_kafka_produce</span><span class="params">(<span class="keyword">rd_kafka_topic_t</span> *rkt, <span class="keyword">int32_t</span> partition,</span></span></span><br><span class="line"><span class="function"><span class="params">                            <span class="keyword">int</span> msgflags,</span></span></span><br><span class="line"><span class="function"><span class="params">                            <span class="keyword">void</span> *payload, <span class="keyword">size_t</span> len,</span></span></span><br><span class="line"><span class="function"><span class="params">                            <span class="keyword">const</span> <span class="keyword">void</span> *key, <span class="keyword">size_t</span> keylen,</span></span></span><br><span class="line"><span class="function"><span class="params">                            <span class="keyword">void</span> *msg_opaque)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>另外，对kafka各种事件进行响应的是:<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd_kafka_poll</span><span class="params">(<span class="keyword">rd_kafka_t</span> *rk, <span class="keyword">int</span> timeout_ms)</span></span>;</span><br><span class="line"><span class="keyword">rd_kafka_message_t</span> *rd_kafka_consumer_poll (<span class="keyword">rd_kafka_t</span> *rk, <span class="keyword">int</span> timeout_ms);</span><br></pre></td></tr></table></figure></p>
+<p>第一个是主要的入口，可以用于producer和consumer，第二个是专门针对consumer的入口。</p>
+<p>除了上边这些主要的，kafka正常运行还需要一些辅助的东西，比如配置，有两个配置项,一个是kafka本身的<code>rd_kafka_conf_t</code>,一个是针对topic的<code>rd_kafka_topic_conf_t</code>:<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 针对kafka本身的rd_kafka_conf_t在创建kafka句柄之前设置，在创建kafka句柄的时候用到，</span></span><br><span class="line"><span class="comment">// 用完就死掉了，不用单独针对rd_kafka_conf_t去销毁，一心想要销毁的还会出错</span></span><br><span class="line"><span class="keyword">rd_kafka_t</span> *rd_kafka_new(<span class="keyword">rd_kafka_type_t</span> type, <span class="keyword">rd_kafka_conf_t</span> *conf,</span><br><span class="line">                            <span class="keyword">char</span> *errstr, <span class="keyword">size_t</span> errstr_size);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 针对topic的rd_kafka_topic_conf_t在创建rd_kafka_topic_t时候会用到，跟上一个的</span></span><br><span class="line"><span class="comment">// 命运一样，用完就死了</span></span><br><span class="line"><span class="keyword">rd_kafka_topic_t</span> *rd_kafka_topic_new(<span class="keyword">rd_kafka_t</span> *rk, <span class="keyword">const</span> <span class="keyword">char</span> *topic,</span><br><span class="line">                            <span class="keyword">rd_kafka_topic_conf_t</span> *conf);</span><br></pre></td></tr></table></figure></p>
+<p>比如队列queue，用来支持低级API把从几个topic收到的message汇聚到一起来处理的额外数据结构，高级api就没有这么自由了。<br>还比如错误处理，至关重要，但是比较琐碎。</p>
+<h2 id="1-错误处理"><a href="#1-错误处理" class="headerlink" title="1. 错误处理"></a>1. 错误处理</h2><p>相关数据结构<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// kafka内部错误信息</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> &#123;</span><br><span class="line">    <span class="comment">/* Internal errors to rdkafka: */</span></span><br><span class="line">    <span class="comment">/** Begin internal error codes */</span></span><br><span class="line">    RD_KAFKA_RESP_ERR__BEGIN = <span class="number">-200</span>,</span><br><span class="line">    ...</span><br><span class="line">&#125; <span class="keyword">rd_kafka_resp_err_t</span>;</span><br></pre></td></tr></table></figure></p>
+<p>获取可读的错误内容的字符串<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">char</span> *<span class="title">rd_kafka_err2str</span> <span class="params">(<span class="keyword">rd_kafka_resp_err_t</span> err)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>获取错误名称的字符串<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">char</span> *<span class="title">rd_kafka_err2name</span> <span class="params">(<span class="keyword">rd_kafka_resp_err_t</span> err)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>获取最近的错误<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 能产生错误的旧API</span></span><br><span class="line"><span class="comment">// rd_kafka_topic_new()</span></span><br><span class="line"><span class="comment">// rd_kafka_consume_start()</span></span><br><span class="line"><span class="comment">// rd_kafka_consume_stop()</span></span><br><span class="line"><span class="comment">// rd_kafka_consume()</span></span><br><span class="line"><span class="comment">// rd_kafka_consume_batch()</span></span><br><span class="line"><span class="comment">// rd_kafka_consume_callback()</span></span><br><span class="line"><span class="comment">// rd_kafka_consume_queue()</span></span><br><span class="line"><span class="comment">// rd_kafka_produce()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span> rd_kafka_last_error (<span class="keyword">void</span>);</span><br></pre></td></tr></table></figure></p>
+<h2 id="2-topic-partition-list操作"><a href="#2-topic-partition-list操作" class="headerlink" title="2. topic_partition_list操作"></a>2. topic_partition_list操作</h2><p>相关数据结构<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 表示一个topic+partition</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">rd_kafka_topic_partition_s</span> &#123;</span></span><br><span class="line">    <span class="keyword">char</span>        *topic;             <span class="comment">/* Topic name */</span></span><br><span class="line">    <span class="keyword">int32_t</span>      partition;         <span class="comment">/* Partition */</span></span><br><span class="line">    <span class="keyword">int64_t</span>      offset;            <span class="comment">/* Offset */</span></span><br><span class="line">    <span class="keyword">void</span>        *metadata;          <span class="comment">/* Metadata */</span></span><br><span class="line">    <span class="keyword">size_t</span>       metadata_size;     <span class="comment">/* Metadata size */</span></span><br><span class="line">    <span class="keyword">void</span>        *opaque;            <span class="comment">/* Application opaque */</span></span><br><span class="line">    <span class="keyword">rd_kafka_resp_err_t</span> err;        <span class="comment">/* Error code, depending on use. */</span></span><br><span class="line">    <span class="keyword">void</span>       *_private;           <span class="comment">/* INTERNAL USE ONLY,</span></span><br><span class="line"><span class="comment">                                         *   INITIALIZE TO ZERO, DO NOT TOUCH */</span></span><br><span class="line">&#125; <span class="keyword">rd_kafka_topic_partition_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 存放的list，一般是操作这个结构</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">rd_kafka_topic_partition_list_s</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> cnt;               <span class="comment">/* Current number of elements */</span></span><br><span class="line">    <span class="keyword">int</span> size;              <span class="comment">/* Current allocated size */</span></span><br><span class="line">    <span class="keyword">rd_kafka_topic_partition_t</span> *elems; <span class="comment">/* Element array[] */</span></span><br><span class="line">&#125; <span class="keyword">rd_kafka_topic_partition_list_t</span>;</span><br></pre></td></tr></table></figure></p>
+<p>新建、销毁list<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建</span></span><br><span class="line"><span class="keyword">rd_kafka_topic_partition_list_t</span> *</span><br><span class="line">rd_kafka_topic_partition_list_new (<span class="keyword">int</span> size);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 销毁</span></span><br><span class="line"><span class="keyword">void</span></span><br><span class="line">rd_kafka_topic_partition_list_destroy (</span><br><span class="line">                                <span class="keyword">rd_kafka_topic_partition_list_t</span> *rkparlist);</span><br></pre></td></tr></table></figure></p>
+<p>添加新元素<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 添加1个元素，返回的element可用于填写其他field</span></span><br><span class="line"><span class="keyword">rd_kafka_topic_partition_t</span> *</span><br><span class="line">rd_kafka_topic_partition_list_add (</span><br><span class="line">                                <span class="keyword">rd_kafka_topic_partition_list_t</span> *rktparlist,</span><br><span class="line">                                <span class="keyword">const</span> <span class="keyword">char</span> *topic, <span class="keyword">int32_t</span> partition);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 添加多个元素</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_topic_partition_list_add_range</span> <span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">rd_kafka_topic_partition_list_t</span> *rktparlist,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">const</span> <span class="keyword">char</span> *topic,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">int32_t</span> start, <span class="keyword">int32_t</span> stop)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>删除元素<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据topic+partition删除</span></span><br><span class="line"><span class="keyword">int</span></span><br><span class="line">rd_kafka_topic_partition_list_del (</span><br><span class="line">                                <span class="keyword">rd_kafka_topic_partition_list_t</span> *rktparlist,</span><br><span class="line">                                <span class="keyword">const</span> <span class="keyword">char</span> *topic, <span class="keyword">int32_t</span> partition);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据index删除</span></span><br><span class="line"><span class="keyword">int</span></span><br><span class="line">rd_kafka_topic_partition_list_del_by_idx (</span><br><span class="line">                                <span class="keyword">rd_kafka_topic_partition_list_t</span> *rktparlist,</span><br><span class="line">                                <span class="keyword">int</span> idx);</span><br></pre></td></tr></table></figure></p>
+<p>查找元素<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">rd_kafka_topic_partition_t</span> *</span><br><span class="line">rd_kafka_topic_partition_list_find (</span><br><span class="line">                                <span class="keyword">rd_kafka_topic_partition_list_t</span> *rktparlist,</span><br><span class="line">                                <span class="keyword">const</span> <span class="keyword">char</span> *topic, <span class="keyword">int32_t</span> partition);</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-message操作"><a href="#3-message操作" class="headerlink" title="3. message操作"></a>3. message操作</h2><p>相关数据结构<br><figure class="highlight vbscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">typedef struct rd_kafka_message_s &#123;</span><br><span class="line">    rd_kafka_resp_err_t <span class="built_in">err</span>;   /* Non-zero <span class="keyword">for</span> <span class="keyword">error</span> signaling. */</span><br><span class="line">    rd_kafka_topic_t *rkt;     /* Topic */</span><br><span class="line">    int32_t partition;         /* Partition */</span><br><span class="line">    void   *payload;           /* Producer: original message payload.</span><br><span class="line">                                * Consumer: Depends <span class="keyword">on</span> the value of <span class="built_in">err</span> :</span><br><span class="line">                                *  <span class="built_in">err</span>==<span class="number">0</span>: Message payload.</span><br><span class="line">                                *  <span class="built_in">err</span>!=<span class="number">0</span>: <span class="keyword">Error</span> <span class="built_in">string</span> */</span><br><span class="line">    size_t  <span class="built_in">len</span>;               /* Depends <span class="keyword">on</span> the value of <span class="built_in">err</span> :</span><br><span class="line">                                *  <span class="built_in">err</span>==<span class="number">0</span>: Message payload length</span><br><span class="line">                                *  <span class="built_in">err</span>!=<span class="number">0</span>: <span class="keyword">Error</span> <span class="built_in">string</span> length */</span><br><span class="line">    void   *key;               /* Depends <span class="keyword">on</span> the value of <span class="built_in">err</span> :</span><br><span class="line">                                *  <span class="built_in">err</span>==<span class="number">0</span>: Optional message key */</span><br><span class="line">    size_t  key_len;           /* Depends <span class="keyword">on</span> the value of <span class="built_in">err</span> :</span><br><span class="line">                                *  <span class="built_in">err</span>==<span class="number">0</span>: Optional message key length*/</span><br><span class="line">    int64_t offset;            /* Consume:</span><br><span class="line">                                *  Message offset (<span class="keyword">or</span> offset <span class="keyword">for</span> <span class="keyword">error</span></span><br><span class="line">                                *   <span class="keyword">if</span> <span class="built_in">err</span>!=<span class="number">0</span> <span class="keyword">if</span> applicable).</span><br><span class="line">                                *  dr_msg_cb:</span><br><span class="line">                                *   Message offset assigned by broker.</span><br><span class="line">                                *   <span class="keyword">If</span> produce.offset.report <span class="keyword">is</span> <span class="keyword">set</span> <span class="keyword">then</span></span><br><span class="line">                                *   <span class="keyword">each</span> message will have this field <span class="keyword">set</span>,</span><br><span class="line">                                *   otherwise only the last message <span class="keyword">in</span></span><br><span class="line">                                *   <span class="keyword">each</span> produced internal batch will</span><br><span class="line">                                *   have this field <span class="keyword">set</span>, otherwise <span class="number">0.</span> */</span><br><span class="line">    void  *_private;           /* Consume:</span><br><span class="line">                                *   rdkafka <span class="keyword">private</span> pointer: <span class="keyword">DO</span> <span class="keyword">NOT</span> MODIFY</span><br><span class="line">                                *   dr_msg_cb:</span><br><span class="line">                                *    msg_opaque from produce() <span class="keyword">call</span> */</span><br><span class="line">&#125; rd_kafka_message_t;</span><br></pre></td></tr></table></figure></p>
+<p>销毁message<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_message_destroy</span><span class="params">(<span class="keyword">rd_kafka_message_t</span> *rkmessage)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>获取message中的错误信息<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">char</span> *</span><br><span class="line">rd_kafka_message_errstr(<span class="keyword">const</span> <span class="keyword">rd_kafka_message_t</span> *rkmessage);</span><br></pre></td></tr></table></figure></p>
+<p>获取message中的时间戳<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 时间戳类型</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> <span class="keyword">rd_kafka_timestamp_type_t</span> &#123;</span><br><span class="line">    RD_KAFKA_TIMESTAMP_NOT_AVAILABLE,   <span class="comment">/* Timestamp not available */</span></span><br><span class="line">    RD_KAFKA_TIMESTAMP_CREATE_TIME,     <span class="comment">/* Message creation time */</span></span><br><span class="line">    RD_KAFKA_TIMESTAMP_LOG_APPEND_TIME  <span class="comment">/* Log append time */</span></span><br><span class="line">&#125; <span class="keyword">rd_kafka_timestamp_type_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int64_t</span> rd_kafka_message_timestamp (<span class="keyword">const</span> <span class="keyword">rd_kafka_message_t</span> *rkmessage,</span><br><span class="line">                                    <span class="keyword">rd_kafka_timestamp_type_t</span> *tstype);</span><br></pre></td></tr></table></figure></p>
+<h2 id="4-conf操作"><a href="#4-conf操作" class="headerlink" title="4. conf操作"></a>4. conf操作</h2><p>相关数据结构<br><figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 配置时错误类型</span><br><span class="line">typedef enum &#123;</span><br><span class="line">    <span class="type">RD_KAFKA_CONF_UNKNOWN</span> = -2, /**&lt; <span class="type">Unknown</span> configuration name. */</span><br><span class="line">    <span class="type">RD_KAFKA_CONF_INVALID</span> = -1, /**&lt; <span class="type">Invalid</span> configuration value. */</span><br><span class="line">    <span class="type">RD_KAFKA_CONF_OK</span> = 0        /**&lt; <span class="type">Configuration</span> okay */</span><br><span class="line">&#125; rd_kafka_conf_res_t;</span><br></pre></td></tr></table></figure></p>
+<p>创建、销毁、复制配置句柄<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">rd_kafka_conf_t</span> *rd_kafka_conf_new(<span class="keyword">void</span>);</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_conf_destroy</span><span class="params">(<span class="keyword">rd_kafka_conf_t</span> *conf)</span></span>;</span><br><span class="line"><span class="keyword">rd_kafka_conf_t</span> *rd_kafka_conf_dup(<span class="keyword">const</span> <span class="keyword">rd_kafka_conf_t</span> *conf);</span><br></pre></td></tr></table></figure></p>
+<p>设置某个配置项,所有可以设置的配置项见 <a href="https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md" target="_blank" rel="noopener">CONFIGURATION.md</a><br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">rd_kafka_conf_res_t</span> rd_kafka_conf_set(<span class="keyword">rd_kafka_conf_t</span> *conf,</span><br><span class="line">                                <span class="keyword">const</span> <span class="keyword">char</span> *name,</span><br><span class="line">                                <span class="keyword">const</span> <span class="keyword">char</span> *value,</span><br><span class="line">                                <span class="keyword">char</span> *errstr, <span class="keyword">size_t</span> errstr_size);</span><br></pre></td></tr></table></figure></p>
+<p>设置回调，好多个回调<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// producer发送message后会不论成功或失败都会产生一个事件，该事件触发如下回调</span></span><br><span class="line"><span class="comment">// 这个不推荐使用了，参数比较多</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_conf_set_dr_cb</span><span class="params">(<span class="keyword">rd_kafka_conf_t</span> *conf,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">void</span> (*dr_cb) (<span class="keyword">rd_kafka_t</span> *rk,</span></span></span><br><span class="line"><span class="function"><span class="params">                                         <span class="keyword">void</span> *payload, <span class="keyword">size_t</span> len,</span></span></span><br><span class="line"><span class="function"><span class="params">                                         <span class="keyword">rd_kafka_resp_err_t</span> err,</span></span></span><br><span class="line"><span class="function"><span class="params">                                         <span class="keyword">void</span> *opaque, <span class="keyword">void</span> *msg_opaque))</span></span>;</span><br><span class="line"><span class="comment">// 推荐使用这个，参数统一到了rd_kafka_message_t</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_conf_set_consume_cb</span> <span class="params">(<span class="keyword">rd_kafka_conf_t</span> *conf,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">void</span> (*consume_cb) (<span class="keyword">rd_kafka_message_t</span> *</span></span></span><br><span class="line"><span class="function"><span class="params">                                         rkmessage,</span></span></span><br><span class="line"><span class="function"><span class="params">                                         <span class="keyword">void</span> *opaque))</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// consumer接收message后的回调，配合rd_kafka_consumer_poll()使用</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_conf_set_consume_cb</span> <span class="params">(<span class="keyword">rd_kafka_conf_t</span> *conf,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">void</span> (*consume_cb) (<span class="keyword">rd_kafka_message_t</span> *</span></span></span><br><span class="line"><span class="function"><span class="params">                                         rkmessage,</span></span></span><br><span class="line"><span class="function"><span class="params">                                         <span class="keyword">void</span> *opaque))</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 重新负载均衡的时候的回调</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_conf_set_rebalance_cb</span> <span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">rd_kafka_conf_t</span> *conf,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">void</span> (*rebalance_cb) (<span class="keyword">rd_kafka_t</span> *rk,</span></span></span><br><span class="line"><span class="function"><span class="params">                                  <span class="keyword">rd_kafka_resp_err_t</span> err,</span></span></span><br><span class="line"><span class="function"><span class="params">                                  <span class="keyword">rd_kafka_topic_partition_list_t</span> *partitions,</span></span></span><br><span class="line"><span class="function"><span class="params">                                  <span class="keyword">void</span> *opaque))</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// commit的时候的回调，跟rd_kafka_consumer_poll()配合使用</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_conf_set_offset_commit_cb</span> <span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">rd_kafka_conf_t</span> *conf,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">void</span> (*offset_commit_cb) (<span class="keyword">rd_kafka_t</span> *rk,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">rd_kafka_resp_err_t</span> err,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">rd_kafka_topic_partition_list_t</span> *offsets,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">void</span> *opaque))</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// kafka内部发生严重错误的时候通知应用的回调</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_conf_set_error_cb</span><span class="params">(<span class="keyword">rd_kafka_conf_t</span> *conf,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">void</span>  (*error_cb) (<span class="keyword">rd_kafka_t</span> *rk, <span class="keyword">int</span> err,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">const</span> <span class="keyword">char</span> *reason,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">void</span> *opaque))</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// producer发送消息或consumer取消息时遇到broker返回限流时间时的回调，不管是返回一段时间还是返回0(限流取消)</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_conf_set_throttle_cb</span> <span class="params">(<span class="keyword">rd_kafka_conf_t</span> *conf,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">void</span> (*throttle_cb) (</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">rd_kafka_t</span> *rk,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">const</span> <span class="keyword">char</span> *broker_name,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">int32_t</span> broker_id,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">int</span> throttle_time_ms,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">void</span> *opaque))</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置日志输出的回调，默认是打印到stderr，内置的log_cb有rd_kafka_log_print(),</span></span><br><span class="line"><span class="comment">// rd_kafka_log_syslog()</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_conf_set_log_cb</span><span class="params">(<span class="keyword">rd_kafka_conf_t</span> *conf,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">void</span> (*log_cb) (<span class="keyword">const</span> <span class="keyword">rd_kafka_t</span> *rk, <span class="keyword">int</span> level,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">const</span> <span class="keyword">char</span> *fac, <span class="keyword">const</span> <span class="keyword">char</span> *buf))</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 统计时回调，由rd_kafka_poll()每隔statistics.interval.ms(需要单独设置)触发</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_conf_set_stats_cb</span><span class="params">(<span class="keyword">rd_kafka_conf_t</span> *conf,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">int</span> (*stats_cb) (<span class="keyword">rd_kafka_t</span> *rk,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">char</span> *json,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">size_t</span> json_len,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">void</span> *opaque))</span></span>;</span><br></pre></td></tr></table></figure></p>
+<h2 id="5-topic操作"><a href="#5-topic操作" class="headerlink" title="5. topic操作"></a>5. topic操作</h2><p>topic_conf创建、销毁、设置等<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建</span></span><br><span class="line"><span class="keyword">rd_kafka_topic_conf_t</span> *rd_kafka_topic_conf_new(<span class="keyword">void</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 备份</span></span><br><span class="line"><span class="keyword">rd_kafka_topic_conf_t</span> *rd_kafka_topic_conf_dup(<span class="keyword">const</span> <span class="keyword">rd_kafka_topic_conf_t</span></span><br><span class="line">		*conf);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 销毁</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_topic_conf_destroy</span><span class="params">(<span class="keyword">rd_kafka_topic_conf_t</span> *topic_conf)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置</span></span><br><span class="line"><span class="keyword">rd_kafka_conf_res_t</span> rd_kafka_topic_conf_set(<span class="keyword">rd_kafka_topic_conf_t</span> *conf,</span><br><span class="line">                                <span class="keyword">const</span> <span class="keyword">char</span> *name,</span><br><span class="line">                                <span class="keyword">const</span> <span class="keyword">char</span> *value,</span><br><span class="line">                                <span class="keyword">char</span> *errstr, <span class="keyword">size_t</span> errstr_size);</span><br></pre></td></tr></table></figure></p>
+<p>topic的各种操作<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建</span></span><br><span class="line"><span class="keyword">rd_kafka_topic_t</span> *rd_kafka_topic_new(<span class="keyword">rd_kafka_t</span> *rk, <span class="keyword">const</span> <span class="keyword">char</span> *topic,</span><br><span class="line">                                <span class="keyword">rd_kafka_topic_conf_t</span> *conf);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 销毁</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_topic_destroy</span><span class="params">(<span class="keyword">rd_kafka_topic_t</span> *rkt)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<h2 id="6-kafka主操作句柄"><a href="#6-kafka主操作句柄" class="headerlink" title="6. kafka主操作句柄"></a>6. kafka主操作句柄</h2><p>rd_kafka_t的各种操作<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建</span></span><br><span class="line"><span class="comment">// kafka类型</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> <span class="keyword">rd_kafka_type_t</span> &#123;</span><br><span class="line">	RD_KAFKA_PRODUCER, <span class="comment">/**&lt; Producer client */</span></span><br><span class="line">	RD_KAFKA_CONSUMER  <span class="comment">/**&lt; Consumer client */</span></span><br><span class="line">&#125; <span class="keyword">rd_kafka_type_t</span>;</span><br><span class="line"><span class="keyword">rd_kafka_t</span> *rd_kafka_new(<span class="keyword">rd_kafka_type_t</span> type, <span class="keyword">rd_kafka_conf_t</span> *conf,</span><br><span class="line">                                <span class="keyword">char</span> *errstr, <span class="keyword">size_t</span> errstr_size);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 销毁</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_destroy</span><span class="params">(<span class="keyword">rd_kafka_t</span> *rk)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// poll，能捕捉到的事件有：</span></span><br><span class="line"><span class="comment">// delivery report callbacks  (if dr_cb/dr_msg_cb is configured) [producer]</span></span><br><span class="line"><span class="comment">// error callbacks (rd_kafka_conf_set_error_cb()) [all]</span></span><br><span class="line"><span class="comment">// stats callbacks (rd_kafka_conf_set_stats_cb()) [all]</span></span><br><span class="line"><span class="comment">// throttle callbacks (rd_kafka_conf_set_throttle_cb()) [all]</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd_kafka_poll</span><span class="params">(<span class="keyword">rd_kafka_t</span> *rk, <span class="keyword">int</span> timeout_ms)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 取消掉该次事件，只能在各种callback中使用</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_yield</span> <span class="params">(<span class="keyword">rd_kafka_t</span> *rk)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 暂停某些partitions发送或接收消息</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span></span><br><span class="line">rd_kafka_pause_partitions (<span class="keyword">rd_kafka_t</span> *rk,</span><br><span class="line">                                <span class="keyword">rd_kafka_topic_partition_list_t</span> *partitions);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 恢复暂停的partitions的工作</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span></span><br><span class="line">rd_kafka_resume_partitions (<span class="keyword">rd_kafka_t</span> *rk,</span><br><span class="line">                                <span class="keyword">rd_kafka_topic_partition_list_t</span> *partitions);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取当前partition的高低水位，阻塞</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span></span><br><span class="line">rd_kafka_query_watermark_offsets (<span class="keyword">rd_kafka_t</span> *rk,</span><br><span class="line">                                <span class="keyword">const</span> <span class="keyword">char</span> *topic, <span class="keyword">int32_t</span> partition,</span><br><span class="line">                                <span class="keyword">int64_t</span> *low, <span class="keyword">int64_t</span> *high, <span class="keyword">int</span> timeout_ms);</span><br><span class="line"><span class="comment">// 获取当前partition的高低水位，非阻塞</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span></span><br><span class="line">rd_kafka_get_watermark_offsets (<span class="keyword">rd_kafka_t</span> *rk,</span><br><span class="line">                                <span class="keyword">const</span> <span class="keyword">char</span> *topic, <span class="keyword">int32_t</span> partition,</span><br><span class="line">                                <span class="keyword">int64_t</span> *low, <span class="keyword">int64_t</span> *high);</span><br></pre></td></tr></table></figure></p>
+<h2 id="7-kafka-queue操作"><a href="#7-kafka-queue操作" class="headerlink" title="7. kafka_queue操作"></a>7. kafka_queue操作</h2><p>kafka_queue能将来自几个不同的topic+partition的message汇总到一个queue中交给应用去处理<br>创建、销毁<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">rd_kafka_queue_t</span> *rd_kafka_queue_new(<span class="keyword">rd_kafka_t</span> *rk);</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_queue_destroy</span><span class="params">(<span class="keyword">rd_kafka_queue_t</span> *rkqu)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>重新路由的操作，不能对相同的topic+partition调用多次<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd_kafka_consume_start_queue</span><span class="params">(<span class="keyword">rd_kafka_topic_t</span> *rkt, <span class="keyword">int32_t</span> partition,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">int64_t</span> offset, <span class="keyword">rd_kafka_queue_t</span> *rkqu)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>接收处理message<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 接收一条message</span></span><br><span class="line"><span class="keyword">rd_kafka_message_t</span> *rd_kafka_consume_queue(<span class="keyword">rd_kafka_queue_t</span> *rkqu,</span><br><span class="line">                                <span class="keyword">int</span> timeout_ms);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 接收多条message</span></span><br><span class="line"><span class="keyword">ssize_t</span> rd_kafka_consume_batch_queue(<span class="keyword">rd_kafka_queue_t</span> *rkqu,</span><br><span class="line">                                <span class="keyword">int</span> timeout_ms,</span><br><span class="line">                                <span class="keyword">rd_kafka_message_t</span> **rkmessages,</span><br><span class="line">                                <span class="keyword">size_t</span> rkmessages_size);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用回调去处理接收到的消息，处理速度最快</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd_kafka_consume_callback_queue</span><span class="params">(<span class="keyword">rd_kafka_queue_t</span> *rkqu,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">int</span> timeout_ms,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">void</span> (*consume_cb) (<span class="keyword">rd_kafka_message_t</span></span></span></span><br><span class="line"><span class="function"><span class="params">                                        *rkmessage,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">void</span> *opaque),</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">void</span> *opaque)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<h2 id="8-consumer操作"><a href="#8-consumer操作" class="headerlink" title="8. consumer操作"></a>8. consumer操作</h2><p>message的offset可以为绝对数或者以下逻辑值：<br><figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RD_KAFK<span class="built_in">A_OFFSET</span>_BEGINNING</span><br><span class="line">RD_KAFK<span class="built_in">A_OFFSET</span>_END</span><br><span class="line">RD_KAFK<span class="built_in">A_OFFSET</span>_STORED</span><br><span class="line">RD_KAFK<span class="built_in">A_OFFSET</span>_TAIL</span><br></pre></td></tr></table></figure></p>
+<p>低级api<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 开始接收message</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd_kafka_consume_start</span><span class="params">(<span class="keyword">rd_kafka_topic_t</span> *rkt, <span class="keyword">int32_t</span> partition,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">int64_t</span> offset)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 停止接收</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd_kafka_consume_stop</span><span class="params">(<span class="keyword">rd_kafka_topic_t</span> *rkt, <span class="keyword">int32_t</span> partition)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 查找现在的offset</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span> rd_kafka_seek (<span class="keyword">rd_kafka_topic_t</span> *rkt,</span><br><span class="line">                                <span class="keyword">int32_t</span> partition,</span><br><span class="line">                                <span class="keyword">int64_t</span> offset,</span><br><span class="line">                                <span class="keyword">int</span> timeout_ms);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 接收一条message</span></span><br><span class="line"><span class="keyword">rd_kafka_message_t</span> *rd_kafka_consume(<span class="keyword">rd_kafka_topic_t</span> *rkt, <span class="keyword">int32_t</span> partition,</span><br><span class="line">                                <span class="keyword">int</span> timeout_ms);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 接收多条message</span></span><br><span class="line"><span class="keyword">ssize_t</span> rd_kafka_consume_batch(<span class="keyword">rd_kafka_topic_t</span> *rkt, <span class="keyword">int32_t</span> partition,</span><br><span class="line">                                <span class="keyword">int</span> timeout_ms,</span><br><span class="line">                                <span class="keyword">rd_kafka_message_t</span> **rkmessages,</span><br><span class="line">                                <span class="keyword">size_t</span> rkmessages_size);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用回调处理收到的message，速度最快</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd_kafka_consume_callback</span><span class="params">(<span class="keyword">rd_kafka_topic_t</span> *rkt, <span class="keyword">int32_t</span> partition,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">int</span> timeout_ms,</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">void</span> (*consume_cb) (<span class="keyword">rd_kafka_message_t</span></span></span></span><br><span class="line"><span class="function"><span class="params">                                     *rkmessage,</span></span></span><br><span class="line"><span class="function"><span class="params">                                     <span class="keyword">void</span> *opaque),</span></span></span><br><span class="line"><span class="function"><span class="params">                                <span class="keyword">void</span> *opaque)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 手动commit</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span> rd_kafka_offset_store(<span class="keyword">rd_kafka_topic_t</span> *rkt,</span><br><span class="line">                                <span class="keyword">int32_t</span> partition, <span class="keyword">int64_t</span> offset);</span><br></pre></td></tr></table></figure></p>
+<p>高级api<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 订阅topic</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span></span><br><span class="line">rd_kafka_subscribe (<span class="keyword">rd_kafka_t</span> *rk,</span><br><span class="line">                                <span class="keyword">const</span> <span class="keyword">rd_kafka_topic_partition_list_t</span> *topics);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 取消订阅</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span> rd_kafka_unsubscribe (<span class="keyword">rd_kafka_t</span> *rk);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取当前的订阅</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span></span><br><span class="line">rd_kafka_subscription (<span class="keyword">rd_kafka_t</span> *rk,</span><br><span class="line">                                <span class="keyword">rd_kafka_topic_partition_list_t</span> **topics);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 消费message</span></span><br><span class="line"><span class="keyword">rd_kafka_message_t</span> *rd_kafka_consumer_poll (<span class="keyword">rd_kafka_t</span> *rk, <span class="keyword">int</span> timeout_ms);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 关闭consumer</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span> rd_kafka_consumer_close (<span class="keyword">rd_kafka_t</span> *rk);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 分派partition,跟rd_kafka_subscribe()的区别就是assign必须有partition才生效，</span></span><br><span class="line"><span class="comment">// 当你知道partition的时候，最好用这个，因为kafka不用再去找了，速度最快</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span></span><br><span class="line">rd_kafka_assign (<span class="keyword">rd_kafka_t</span> *rk,</span><br><span class="line">                            <span class="keyword">const</span> <span class="keyword">rd_kafka_topic_partition_list_t</span> *partitions);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取当前分派的partition</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span></span><br><span class="line">rd_kafka_assignment (<span class="keyword">rd_kafka_t</span> *rk,</span><br><span class="line">                            <span class="keyword">rd_kafka_topic_partition_list_t</span> **partitions);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 手动commit，可以同步可以异步，异步的时候要设置rd_kafka_conf_set_offset_commit_cb()</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span></span><br><span class="line">rd_kafka_commit (<span class="keyword">rd_kafka_t</span> *rk, <span class="keyword">const</span> <span class="keyword">rd_kafka_topic_partition_list_t</span> *offsets,</span><br><span class="line">                            <span class="keyword">int</span> async);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 手动commit</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span></span><br><span class="line">rd_kafka_commit_message (<span class="keyword">rd_kafka_t</span> *rk, <span class="keyword">const</span> <span class="keyword">rd_kafka_message_t</span> *rkmessage,</span><br><span class="line">                            <span class="keyword">int</span> async);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取当前commit的offset</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span></span><br><span class="line">rd_kafka_committed (<span class="keyword">rd_kafka_t</span> *rk,</span><br><span class="line">                            <span class="keyword">rd_kafka_topic_partition_list_t</span> *partitions,</span><br><span class="line">                            <span class="keyword">int</span> timeout_ms);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取当前topic+partition的offset</span></span><br><span class="line"><span class="keyword">rd_kafka_resp_err_t</span></span><br><span class="line">rd_kafka_position (<span class="keyword">rd_kafka_t</span> *rk,</span><br><span class="line">                            <span class="keyword">rd_kafka_topic_partition_list_t</span> *partitions);</span><br></pre></td></tr></table></figure></p>
+<p>要调用<code>rd_kafka_consumer_poll()</code>，还需要一个高级API:<br><figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 将接收到 queue 从rd_kafk<span class="built_in">a_poll</span>()重定向到rd_kafk<span class="built_in">a_poll</span>_set_consumer()</span><br><span class="line">rd_kafk<span class="built_in">a_resp</span>_err_t rd_kafk<span class="built_in">a_poll</span>_set_consumer (rd_kafk<span class="built_in">a_t</span> *rk)<span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="9-producer操作"><a href="#9-producer操作" class="headerlink" title="9. producer操作"></a>9. producer操作</h2><p>message flags<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RD_KAFKA_MSG_F_FREE  0x1 <span class="comment">/* Delegate freeing of payload to rdkafka. */</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RD_KAFKA_MSG_F_COPY  0x2 <span class="comment">/* rdkafka will make a copy of the payload. */</span></span></span><br></pre></td></tr></table></figure></p>
+<p>发送<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 发送一条</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd_kafka_produce</span><span class="params">(<span class="keyword">rd_kafka_topic_t</span> *rkt, <span class="keyword">int32_t</span> partition,</span></span></span><br><span class="line"><span class="function"><span class="params">                            <span class="keyword">int</span> msgflags,</span></span></span><br><span class="line"><span class="function"><span class="params">                            <span class="keyword">void</span> *payload, <span class="keyword">size_t</span> len,</span></span></span><br><span class="line"><span class="function"><span class="params">                            <span class="keyword">const</span> <span class="keyword">void</span> *key, <span class="keyword">size_t</span> keylen,</span></span></span><br><span class="line"><span class="function"><span class="params">                            <span class="keyword">void</span> *msg_opaque)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 发送很多条</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd_kafka_produce_batch</span><span class="params">(<span class="keyword">rd_kafka_topic_t</span> *rkt, <span class="keyword">int32_t</span> partition,</span></span></span><br><span class="line"><span class="function"><span class="params">                            <span class="keyword">int</span> msgflags,</span></span></span><br><span class="line"><span class="function"><span class="params">                            <span class="keyword">rd_kafka_message_t</span> *rkmessages, <span class="keyword">int</span> message_cnt)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<h2 id="10-杂项"><a href="#10-杂项" class="headerlink" title="10.杂项"></a>10.杂项</h2><p>获取元信息(metadata，就是全局的一些信息，比如broker的地址啦，名称啦，topic的个数啦，都叫什么啦)<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">rd_kafka_resp_err_t</span></span><br><span class="line">rd_kafka_metadata (<span class="keyword">rd_kafka_t</span> *rk, <span class="keyword">int</span> all_topics,</span><br><span class="line">                           <span class="keyword">rd_kafka_topic_t</span> *only_rkt,</span><br><span class="line">                           <span class="keyword">const</span> struct rd_kafka_metadata **metadatap,</span><br><span class="line">                           <span class="keyword">int</span> timeout_ms);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_metadata_destroy</span><span class="params">(<span class="keyword">const</span> struct rd_kafka_metadata *metadata)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>groups信息<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取信息</span></span><br><span class="line">rd_kafka_resp_err_t</span><br><span class="line">rd_kafka_list_groups (rd_kafka_t *rk, <span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">group</span>,</span><br><span class="line">                            <span class="keyword">const</span> <span class="keyword">struct</span> rd_kafka_group_list **grplistp,</span><br><span class="line">                            <span class="keyword">int</span> timeout_ms);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 销毁获取的结构体</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_group_list_destroy</span> (<span class="params"><span class="keyword">const</span> <span class="keyword">struct</span> rd_kafka_group_list *grplist</span>)</span>;</span><br></pre></td></tr></table></figure></p>
+<p>添加brokers<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd_kafka_brokers_add</span><span class="params">(<span class="keyword">rd_kafka_t</span> *rk, <span class="keyword">const</span> <span class="keyword">char</span> *brokerlist)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>设置kafka内部日志等级<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_set_log_level</span><span class="params">(<span class="keyword">rd_kafka_t</span> *rk, <span class="keyword">int</span> level)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>导出当前kafka的状态，只用于debug<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rd_kafka_dump</span><span class="params">(FILE *fp, <span class="keyword">rd_kafka_t</span> *rk)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ol>
+<li><a href="https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md" target="_blank" rel="noopener">针对kafka本身的所有的配置项CONFIGURATION.md</a></li>
+<li><a href="https://github.com/edenhill/librdkafka" target="_blank" rel="noopener">kafka的C客户端github</a></li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/c/" rel="tag"># c</a>
+          
+            <a href="/tags/kafka/" rel="tag"># kafka</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/01/shell脚本读取文件一行/" rel="next" title="shell脚本读取文件一行">
+                <i class="fa fa-chevron-left"></i> shell脚本读取文件一行
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/11/《编码，隐匿在计算机软硬件背后的语言》/" rel="prev" title="《编码，隐匿在计算机软硬件背后的语言》">
+                《编码，隐匿在计算机软硬件背后的语言》 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">suntus</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">77</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-总结"><span class="nav-text">0. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-错误处理"><span class="nav-text">1. 错误处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-topic-partition-list操作"><span class="nav-text">2. topic_partition_list操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-message操作"><span class="nav-text">3. message操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-conf操作"><span class="nav-text">4. conf操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-topic操作"><span class="nav-text">5. topic操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-kafka主操作句柄"><span class="nav-text">6. kafka主操作句柄</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-kafka-queue操作"><span class="nav-text">7. kafka_queue操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-consumer操作"><span class="nav-text">8. consumer操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-producer操作"><span class="nav-text">9. producer操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-杂项"><span class="nav-text">10.杂项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">suntus</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+  
+  <script id="dsq-count-scr" src="https://https-suntus-github-io.disqus.com/count.js" async></script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://suntus.github.io/2016/07/07/librdkafka--kafka C api介绍/";
+    this.page.identifier = "2016/07/07/librdkafka--kafka C api介绍/";
+    this.page.title = 'librdkafka--kafka C api介绍';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://https-suntus-github-io.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    loadComments();
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

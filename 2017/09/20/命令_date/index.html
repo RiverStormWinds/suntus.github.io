@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1. 显示和设置系统日期和时间date [OPTION]… [+FORMAT]date [-u| –utc| -universal] [MMDDhhmm[[CC]UYY][.ss]] 2. 其实核心的只有1个功能：输入特定格式的时间，转换成自己想要的时间格式">
+<meta name="keywords" content="linux,cli">
+<meta property="og:type" content="article">
+<meta property="og:title" content="命令_date">
+<meta property="og:url" content="http://suntus.github.io/2017/09/20/命令_date/index.html">
+<meta property="og:site_name" content="Morning~Sun。">
+<meta property="og:description" content="1. 显示和设置系统日期和时间date [OPTION]… [+FORMAT]date [-u| –utc| -universal] [MMDDhhmm[[CC]UYY][.ss]] 2. 其实核心的只有1个功能：输入特定格式的时间，转换成自己想要的时间格式">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-09-22T08:35:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="命令_date">
+<meta name="twitter:description" content="1. 显示和设置系统日期和时间date [OPTION]… [+FORMAT]date [-u| –utc| -universal] [MMDDhhmm[[CC]UYY][.ss]] 2. 其实核心的只有1个功能：输入特定格式的时间，转换成自己想要的时间格式">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Morning~Sun。" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://suntus.github.io/2017/09/20/命令_date/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>命令_date | Morning~Sun。</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-55322469-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-55322469-1');
+  </script>
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Morning~Sun。</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">ha</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://suntus.github.io/2017/09/20/命令_date/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="suntus">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Morning~Sun。">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">命令_date
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: Sep 20th Wed 2017 16:31 16:31:57" itemprop="dateCreated datePublished" datetime="2017-09-20T16:31:57+08:00">Sep 20th Wed 2017 16:31</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: Sep 22nd Fri 2017 16:35 16:35:08" itemprop="dateModified" datetime="2017-09-22T16:35:08+08:00">Sep 22nd Fri 2017 16:35</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <a href="/2017/09/20/命令_date/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">Comments: </span> <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/09/20/命令_date/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-显示和设置系统日期和时间"><a href="#1-显示和设置系统日期和时间" class="headerlink" title="1. 显示和设置系统日期和时间"></a>1. 显示和设置系统日期和时间</h2><p>date [OPTION]… [+FORMAT]<br>date [-u| –utc| -universal] [MMDDhhmm[[CC]UYY][.ss]]</p>
+<h2 id="2-其实核心的只有1个功能："><a href="#2-其实核心的只有1个功能：" class="headerlink" title="2. 其实核心的只有1个功能："></a>2. 其实核心的只有1个功能：</h2><p><strong><em>输入特定格式的时间，转换成自己想要的时间格式</em></strong></p>
+<a id="more"></a>
+<h3 id="2-1-输入使用-d，后边跟描述时间的文字"><a href="#2-1-输入使用-d，后边跟描述时间的文字" class="headerlink" title="2.1 输入使用-d，后边跟描述时间的文字"></a>2.1 输入使用-d，后边跟描述时间的文字</h3><p>比如<br>“Sun, 29 Feb 2004 16:21:42 -0800”, “2004-02-29 16:21:42” , “next Thursday”, “-10day”, “+10min”等等，该描述性的文字由指示日历的日期，时间的天，时间的时区，天的星期，相对时间，相对日期和数字组成。空字符串表示这天的开始。</p>
+<h3 id="2-2-输出使用-FORMAT，后边跟各种格式："><a href="#2-2-输出使用-FORMAT，后边跟各种格式：" class="headerlink" title="2.2 输出使用+FORMAT，后边跟各种格式："></a>2.2 输出使用+FORMAT，后边跟各种格式：</h3><p>%%: 符号%<br>%a: 本地星期缩写， Sun<br>%A: 本地星期全称， Sunday<br>%b: 本地月份缩写, Jan<br>%B: 本地月份全称, January<br>%c: 本地日期和时间, Thu Mar 3 23:-5:25 2005<br>%C: 世纪，类似%Y，DNA没有后两位, 20<br>%d: 月的第几天, 01<br>%D: 日期，%m/%d/%y<br>%e: 月的天数，用空格填充，类似%_d<br>%F: 完整的日期格式，类似%F-%m-%d<br>%g: ISO格式年的后两位<br>%G: ISO格式的年<br>%h: 跟%b一样<br>%H: 小时(00..23)<br>%I: 小时(01..12)<br>%j: 年的第几天(001..366)<br>%k: 小时，用空格填充(0..23); 类似%_H<br>%l: 小时，用空格填充(1..12) ； 类似%_I<br>%m: 月(01..12)<br>%M: 分钟(00..59)<br>%n: 换行<br>%N: 纳秒,nanoseconds(0000000000..999999999)<br>%p: 本地的AM或者PM<br>%P: 类似%p，但是是小写<br>%r：本地12小时制时钟时间  11:11:04 PM<br>%R: 24小时制的小时跟分钟，类似%H:%M<br>%s: 从1970-01-01 00:00:00 UTC开始的秒数，时间戳<br>%S: 秒(00..60)<br>%t: tab字符<br>%T: 时间，类似%H:%M:%S<br>%u: 星期的第几天(1..7),1是星期一<br>%U: 年的第几个星期(00..53)，周日是星期的开始<br>%V: ISO星期制，星期一是星期的开始（01..53）<br>%w: 星期的第几天(0..6)，0是星期天<br>%W: 年的第几个星期(00..53)，周一是星期的开始<br>%x:  本地日期表示(12/31/99)<br>%X: 本地时间表示(23:13:48)<br>%y: 年的后两位数字(00..99)<br>%Y: 年<br>另外还有几个符号，用于修饰<br>-  不填充<br>_ 用空格填充<br>0 用0填充<br>^ 用大写<br>#  用相反的大小写</p>
+<h2 id="3-几个例子："><a href="#3-几个例子：" class="headerlink" title="3. 几个例子："></a>3. 几个例子：</h2><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 输出今天开始时间</span></span><br><span class="line">date -d <span class="string">""</span></span><br><span class="line"><span class="comment"># 当前时间戳</span></span><br><span class="line">date +%s</span><br><span class="line"><span class="comment"># 输出好看的时间：2017-9-20 16:21:42</span></span><br><span class="line">date +<span class="string">"%F %T"</span></span><br><span class="line"><span class="comment"># 将时间戳转换成可读时间，对这里的时间戳前边要加@</span></span><br><span class="line">date -d @1505896166 +<span class="string">"%F %T"</span></span><br><span class="line"><span class="comment"># 输出10分钟前的时间戳</span></span><br><span class="line">date -d <span class="string">"-10min"</span> +%s</span><br></pre></td></tr></table></figure>
+<p>至于设置系统时间，加个-s就行了。</p>
+<hr>
+<p>参考：</p>
+<ol>
+<li>man date</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/linux/" rel="tag"># linux</a>
+          
+            <a href="/tags/cli/" rel="tag"># cli</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/19/用到的tmux/" rel="next" title="用到的tmux">
+                <i class="fa fa-chevron-left"></i> 用到的tmux
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/22/shell IO重定向/" rel="prev" title="shell IO重定向">
+                shell IO重定向 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">suntus</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">77</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-显示和设置系统日期和时间"><span class="nav-text">1. 显示和设置系统日期和时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-其实核心的只有1个功能："><span class="nav-text">2. 其实核心的只有1个功能：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-输入使用-d，后边跟描述时间的文字"><span class="nav-text">2.1 输入使用-d，后边跟描述时间的文字</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-输出使用-FORMAT，后边跟各种格式："><span class="nav-text">2.2 输出使用+FORMAT，后边跟各种格式：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-几个例子："><span class="nav-text">3. 几个例子：</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">suntus</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+  
+  <script id="dsq-count-scr" src="https://https-suntus-github-io.disqus.com/count.js" async></script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://suntus.github.io/2017/09/20/命令_date/";
+    this.page.identifier = "2017/09/20/命令_date/";
+    this.page.title = '命令_date';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://https-suntus-github-io.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    loadComments();
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

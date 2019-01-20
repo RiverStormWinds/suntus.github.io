@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="The “Clockwise/Spiral Rule”By David Anderson 每个C程序员在脑袋里解析任何C声明的时候都会用到一种技术——顺时针/螺旋规则!">
+<meta name="keywords" content="c,tr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="顺时针规则--C语言声明">
+<meta property="og:url" content="http://suntus.github.io/2017/12/19/顺时针规则--C语言声明/index.html">
+<meta property="og:site_name" content="Morning~Sun。">
+<meta property="og:description" content="The “Clockwise/Spiral Rule”By David Anderson 每个C程序员在脑袋里解析任何C声明的时候都会用到一种技术——顺时针/螺旋规则!">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-12-20T01:26:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="顺时针规则--C语言声明">
+<meta name="twitter:description" content="The “Clockwise/Spiral Rule”By David Anderson 每个C程序员在脑袋里解析任何C声明的时候都会用到一种技术——顺时针/螺旋规则!">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Morning~Sun。" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://suntus.github.io/2017/12/19/顺时针规则--C语言声明/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>顺时针规则--C语言声明 | Morning~Sun。</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-55322469-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-55322469-1');
+  </script>
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Morning~Sun。</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">ha</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://suntus.github.io/2017/12/19/顺时针规则--C语言声明/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="suntus">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Morning~Sun。">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">顺时针规则--C语言声明
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: Dec 19th Tue 2017 13:44 13:44:49" itemprop="dateCreated datePublished" datetime="2017-12-19T13:44:49+08:00">Dec 19th Tue 2017 13:44</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: Dec 20th Wed 2017 9:26 09:26:54" itemprop="dateModified" datetime="2017-12-20T09:26:54+08:00">Dec 20th Wed 2017 9:26</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <a href="/2017/12/19/顺时针规则--C语言声明/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">Comments: </span> <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/12/19/顺时针规则--C语言声明/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>The “Clockwise/Spiral Rule”<br>By David Anderson</p>
+<p>每个C程序员在脑袋里解析任何C声明的时候都会用到一种技术——顺时针/螺旋规则!<br><a id="more"></a><br>该规则只有简单的3步：</p>
+<ol>
+<li><p>从未知元素开始，沿顺时针/螺旋方向移动；当遇到如下元素的时候，用相应的自然语言陈述出来：</p>
+<ul>
+<li>[X] 或者 [] =&gt; 大小为…的数组X 或 未知大小数组的…(Array X size of… or Array undefined size of…)</li>
+<li>(type1, type2) =&gt; 传入type1和type2参数、返回…的函数(function passing type1 and type2 returning…)</li>
+<li>* =&gt; 指向…的指针(pointer(s) to…)</li>
+</ul>
+</li>
+<li><p>一直沿着顺时针往下进行，直到覆盖了所有的元素。</p>
+</li>
+<li>括号内的永远优先!</li>
+</ol>
+<p>其实对英文来说就是不断在后边加定语，但对汉语来说，就需要不断在前边加定语。</p>
+<h2 id="1-简单声明"><a href="#1-简单声明" class="headerlink" title="1.简单声明"></a>1.简单声明</h2><pre><code>     +-------+
+     | +-+   |
+     | ^ |   |
+char *str[10];
+ ^   ^   |   |
+ |   +---+   |
+ +-----------+
+</code></pre><p>首先需要问的是：<code>str</code>是什么？</p>
+<blockquote>
+<p>str 是个…(str is an…)</p>
+<ul>
+<li>我们从<code>str</code>开始顺时针移动，碰到的第一个元素是<code>[</code>，这意味着我们碰到了个数组，于是就有…<br>str是个大小是10、…的数组(str is an array 10 of…)</li>
+<li>继续顺时针，下一个遇到的是<code>*</code>,这意味着我们碰到了个指针，就有…<br>str是个大小是10、指向…指针的数组(str is an array 10 of pointers to…)</li>
+<li>继续，下一个是该行结尾<code>;</code>；继续，接下来是<code>char</code>，因此…<br>str是个大小是10、指向字符的指针的数组(str is an array 10 of pointers to char)</li>
+</ul>
+</blockquote>
+<h2 id="2-指向函数的指针的声明"><a href="#2-指向函数的指针的声明" class="headerlink" title="2.指向函数的指针的声明"></a>2.指向函数的指针的声明</h2><pre><code>     +--------------------+
+     | +---+              |
+     | |+-+|              |
+     | |^ ||              |
+char *(*fp)( int, float *);
+ ^   ^ ^  ||              |
+ |   | +--+|              |
+ |   +-----+              |
+ +------------------------+
+</code></pre><p>还是一样，首先要问：<code>fp</code>是什么？</p>
+<blockquote>
+<p>fp 是个…(fp is a…)</p>
+<ul>
+<li>顺时针移动，首先看到了<code>)</code>，因此<code>fp</code>就在括号中了，我们在括号中顺时针移动，下一个看到的是<code>*</code>，因此…<br>fp 是个指向…的指针(fp is a pointer to…)</li>
+<li>跳出括号，继续顺时针转动，看到了<code>(</code>，这表明遇到了一个函数，就有…<br>fp 是个指向传入参数是int和指向float的指针、返回值是…的函数的指针(fp is a pointer to a function passing an int and a pointer to float returning…)</li>
+<li>继续顺时针，看到了<code>*</code>，说明…<br>fp 是个指向传入参数是int和指向float的指针、返回值是指向…的指针的函数的指针(fp is a pointer to a funciton passing an int and a pointer to float returning a pointer to…)</li>
+<li>继续，遇到<code>;</code>；再继续，遇到了<code>char</code>，因此…<br>fp 是个指向传入参数是int和指向float的指针、返回值是指向char的指针的函数的指针(fp is a pointer to a function passing an int and a pointer to float returning a pointer to a char)</li>
+</ul>
+</blockquote>
+<h2 id="3-终极形态"><a href="#3-终极形态" class="headerlink" title="3.终极形态"></a>3.终极形态</h2><pre><code>      +-----------------------------+
+      |                  +---+      |
+      |  +---+           |+-+|      |
+      |  ^   |           |^ ||      |
+void (*signal(int, void (*fp)(int)))(int);
+ ^    ^      |      ^    ^  ||      |
+ |    +------+      |    +--+|      |
+ |                  +--------+      |
+ +----------------------------------+
+</code></pre><p>依然是:<code>signal</code>是什么?<br>注意<code>signal</code>在括号中，需要先解决它</p>
+<ul>
+<li>顺时针移动，首先遇到<code>(</code>，因此…<blockquote>
+<p>signal是个传入参数为int和…,返回…的函数(signal is a function passing an int and a…)</p>
+</blockquote>
+</li>
+<li>接着，我们可以对<code>fp</code>用相同的规则，<code>fp</code>是什么？<code>fp</code>在括号中，首先遇到的是<code>*</code>，于是…<blockquote>
+<p>fp是个指向…的指针(fp is a pointer to…)</p>
+</blockquote>
+</li>
+<li>继续会遇到<code>(</code>，就有…<blockquote>
+<p>fp是个指向传入参数是int、返回…的函数的指针(fp is a pointer to a function passing int returning…)</p>
+</blockquote>
+</li>
+<li>接着，看到了<code>void</code>…<blockquote>
+<p>fp 是个指向传入参数是int、返回值为空(void)的函数的指针(fp is a pointer to a function passing int returning nothing (void))</p>
+</blockquote>
+</li>
+<li>现在结束了对<code>fp</code>的解析，接着看<code>signal</code>…<blockquote>
+<p>signal是个传入参数为int和指向传入参数为int、返回值为空的函数的指针，返回值为…的函数(signal is a function passing an int and a pointer to a function passing an int returning nothing(void) returning…)</p>
+</blockquote>
+</li>
+<li>现在还在括号内，接着的元素是<code>*</code>…<blockquote>
+<p>signal是个传入参数为int和指向传入参数为int、返回值为空的函数的指针，返回值为指向…的指针的函数(signal is a function passing an int and a pointer to a funciton passing an int returning nothing(void) returning a pointer to…)</p>
+</blockquote>
+</li>
+<li>再继续，碰到了<code>(</code>…<blockquote>
+<p>signal是个传入参数为int何指向传入参数为int、返回值为空的函数的指针，返回值为指向一个传入参数为int、返回值为…的函数的指针的指针的函数(signal is a function passing an int and a pointer to a function passing an int returning nothing(void) returning a pointer to a function passing an int and returning…)</p>
+</blockquote>
+</li>
+<li>终于到最后了，我们只剩下<code>void</code>这一个元素了，最终<code>signale</code>的定义为…<blockquote>
+<p>signal是个传入参数为int何指向传入参数为int、返回值为空的函数的指针，返回值为指向一个传入参数为int、返回值为空的函数的指针的指针的函数(signal is a function passing an int and a pointer to a function passing an int returning nothing(void) returning a pointer to a function passing an int and returning nothing(void))</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="const和volatile的例子"><a href="#const和volatile的例子" class="headerlink" title="const和volatile的例子"></a><code>const</code>和<code>volatile</code>的例子</h2><p>规则一样的<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> *chptr:</span><br></pre></td></tr></table></figure></p>
+<p><code>chptr</code>是个指向一个char常量(constant)的指针(chptr is a pointer to a char constant)</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> * <span class="keyword">const</span> chptr;</span><br></pre></td></tr></table></figure>
+<p><code>chptr</code>是个指向char的常量指针(chptr is a constant pointer to char)</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">volatile</span> <span class="keyword">char</span> * <span class="keyword">const</span> chptr;</span><br></pre></td></tr></table></figure>
+<p><code>chptr</code>是个指向一个char原子(volatile)的常量指针(chptr is a constant pointer to a char volatile)</p>
+<hr>
+<p>C的复杂声明其实就不断加定语，但是这个定语在修饰的是哪个主语，需要按照顺时针/螺旋规则来解释。熟悉了就好。</p>
+<hr>
+<p>原文: <a href="http://c-faq.com/decl/spiral.anderson.html" target="_blank" rel="noopener">The <code></code>Clockwise/Spiral Rule’’</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/c/" rel="tag"># c</a>
+          
+            <a href="/tags/tr/" rel="tag"># tr</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/08/软件的12个要素/" rel="next" title="软件的12个要素">
+                <i class="fa fa-chevron-left"></i> 软件的12个要素
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">suntus</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">77</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-简单声明"><span class="nav-text">1.简单声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-指向函数的指针的声明"><span class="nav-text">2.指向函数的指针的声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-终极形态"><span class="nav-text">3.终极形态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#const和volatile的例子"><span class="nav-text">const和volatile的例子</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">suntus</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+  
+  <script id="dsq-count-scr" src="https://https-suntus-github-io.disqus.com/count.js" async></script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://suntus.github.io/2017/12/19/顺时针规则--C语言声明/";
+    this.page.identifier = "2017/12/19/顺时针规则--C语言声明/";
+    this.page.title = '顺时针规则--C语言声明';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://https-suntus-github-io.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    loadComments();
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

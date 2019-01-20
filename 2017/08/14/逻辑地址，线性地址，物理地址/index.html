@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="。。。">
+<meta name="keywords" content="os">
+<meta property="og:type" content="article">
+<meta property="og:title" content="逻辑地址，线性地址，物理地址">
+<meta property="og:url" content="http://suntus.github.io/2017/08/14/逻辑地址，线性地址，物理地址/index.html">
+<meta property="og:site_name" content="Morning~Sun。">
+<meta property="og:description" content="。。。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/280482-8bea53f7396c69e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/280482-fb27017f9d421d73.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/280482-99c05ac3dceedabb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/280482-63214309b60c45e3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/280482-7e0a876d7d50009e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/280482-ad183344059e0d58.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/280482-e88812256a74ff18.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/280482-947492f9b5636b64.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-01-09T07:45:32.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="逻辑地址，线性地址，物理地址">
+<meta name="twitter:description" content="。。。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/280482-8bea53f7396c69e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Morning~Sun。" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://suntus.github.io/2017/08/14/逻辑地址，线性地址，物理地址/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>逻辑地址，线性地址，物理地址 | Morning~Sun。</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-55322469-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-55322469-1');
+  </script>
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Morning~Sun。</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">ha</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://suntus.github.io/2017/08/14/逻辑地址，线性地址，物理地址/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="suntus">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Morning~Sun。">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">逻辑地址，线性地址，物理地址
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: Aug 14th Mon 2017 9:46 09:46:51" itemprop="dateCreated datePublished" datetime="2017-08-14T09:46:51+08:00">Aug 14th Mon 2017 9:46</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: Jan 9th Tue 2018 15:45 15:45:32" itemprop="dateModified" datetime="2018-01-09T15:45:32+08:00">Jan 9th Tue 2018 15:45</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <a href="/2017/08/14/逻辑地址，线性地址，物理地址/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">Comments: </span> <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/08/14/逻辑地址，线性地址，物理地址/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>。。。<br><a id="more"></a><br>首先，我们有1块物理内存，比如4G的DDR3，如果CPU想要找这个内存里边的一块区域存储的东西(0、1)，需要知道这块区域在哪里，最简单的就是把物理内存的一个个存储单元都编号，比如位置在最开头的就编号为0x00，接下来一个单元就编号0x01，…，这里每个单元都是1位，也就是只能存1个0或1个1，就像这样：<br><img src="http://upload-images.jianshu.io/upload_images/280482-8bea53f7396c69e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>但是这样每一位都进行编号，整个地址编号就太多了，如果我们约定每8位编一个号，那整个地址就是原先的1/8，就像这样：<br><img src="http://upload-images.jianshu.io/upload_images/280482-fb27017f9d421d73.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>为了方便，我们把每8位的一个单元叫做1个字节，0x00指向的就是物理内存中的第1个存储单元，也就是第1个字节，字节是物理内存的最小存储单元。如果想拿到第1个字节第3位中的数字1（标红的位置），那就需要把整个字节都先拿到，再去找里边的数字。</p>
+<p>这里给物理内存编的1个号码就是1个物理地址，所有给物理内存编的号码就叫物理地址的地址空间。</p>
+<p>CPU如果想拿到某个物理内存中的数字，需要发送一组电信号给物理内存芯片，芯片根据这组电信号查找相应地址，然后返回给CPU，这组电信号编码成数字就是物理地址了，就像这样：<br><img src="http://upload-images.jianshu.io/upload_images/280482-99c05ac3dceedabb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>其中CPU到内存控制芯片的这几根线叫地址线，比如常说的某个架构有20根地址线或者32根、36根地址线，就表明CPU可以寻址到的地址空间，比如32根地址线就可以最高寻址到2^32，也就是4G。我们这里画了4根，就可以寻址到2^4，也即是16个字节。</p>
+<p>我们需要编写程序控制CPU进行逻辑处理、计算、存储等动作，当需要读写内存中的数据的时候，最简单的当然是用物理地址去指示CPU问内存控制芯片要哪个地址的数据了，比如：<br><img src="http://upload-images.jianshu.io/upload_images/280482-63214309b60c45e3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>我们想要把0x00中的数据放到寄存器ax中，就把0x00这个地址给CPU，这就可以了，多简单。当然如果真的这么简单，大家都轻松了🙃。事实上，CPU为了能处理多任务，同时在一个任务中区分代码、数据、栈，就需要对内存进行划分，分别存放不同的内容，这样一是为了区分，二是为了保护（比如代码段不允许修改，某些数据只读）。先来想象一下可能的解决办法，我们的目的是想把一段处理逻辑控制在内存0x00~0x07这个段之间，让CPU在运行的时候不能超出这个内存范围去获取代码或数据，超过就要报错。一个简单的方法是设置一个标志位，该标志位表明指令中的地址都需要在0x00~0x07之间，不能超过。在指示0x08~0x15之间的内存的时候，再设置另一个标志位，起到同样的作用。这样就可以将整个内存分为2个段：0x00~0x07，0x08~0x15。每个段的长度是8个字节。每个段都设置一个标志位的方法有点儿笨，我们用每个段的首地址来表示这个段：0x00表示第1个段，0x08表示第2个段，再用跟段的首地址的偏移量来确认段内某个字节的地址。现在我们确定第1个段中第2个字节的地址就是0x00:1(第1个字节的地址是0)。如下图：<br><img src="http://upload-images.jianshu.io/upload_images/280482-7e0a876d7d50009e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>现在我们指令中用到的0x00:1就是逻辑地址，因为它在逻辑上将内存划分为了多个不同的段。我们要做的只是输入0x00:1这个地址，CPU会帮我们把逻辑地址翻译成0x01的物理地址🙂。</p>
+<p>除了使用分段的方式划分内存外，还可以将物理内存直接划分为多个不同的页，称为页帧，一个物理页一般是4K大小，这样控制一页内的内存属性相同，多个不同的页可以使用不同的属性，就跟分段类似了，如下图：<br><img src="http://upload-images.jianshu.io/upload_images/280482-ad183344059e0d58.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>这时候会出现个新问题：CPU已经使用逻辑地址来划分段了，如何去实现分页呢？其实肯定也想到了，在逻辑地址和物理地址之间加一个抽象层接口，也就是我们要说的最后一个地址：线性地址，也叫虚拟地址。线性地址的位置在逻辑地址和物理地址之间，比如在讲linux内核的书里边常见有这样的图：<br><img src="http://upload-images.jianshu.io/upload_images/280482-e88812256a74ff18.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>CPU将逻辑地址按照分段逻辑转换成线性地址，再按分页逻辑转换成物理地址。这里的转换都是依靠CPU电路完成的，但是怎样分段，怎样分页是需要内核程序先规定好才行。CPU怎样进行分段和分页的就不细说了，<a href="http://ilinuxkernel.com/?p=1276" target="_blank" rel="noopener">这里</a>讲的真好，可以去看看。<br>我们来对比一下分段和分页：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>分段</th>
+<th>分页</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>目的</td>
+<td>将内存按照不同的属性分隔，实现隔离和保护</td>
+<td>将内存按照不同的属性分隔，实现隔离和保护</td>
+</tr>
+<tr>
+<td>对象</td>
+<td>对线性地址进行分隔</td>
+<td>对物理页帧进行分隔</td>
+</tr>
+<tr>
+<td>方法</td>
+<td>使用逻辑地址（段基址:偏移）分隔不同的段</td>
+<td>将线性地址分隔成不同的部分，一步步去寻找页对应的物理页帧，进而找到对应的物理地址</td>
+</tr>
+<tr>
+<td>程序需要事先做好的准备</td>
+<td>准备好GDT,LDT,IDT，也就是个个不同的段</td>
+<td>准备好页目录，页表，也就是各个不同的页</td>
+</tr>
+<tr>
+<td>大小</td>
+<td>段大小可变，程序控制</td>
+<td>页大小固定的几个值，4K,4M,2M，CPU规定好的</td>
+</tr>
+</tbody>
+</table>
+<p>好了，现在我们的CPU中地址关系如下：<br><img src="http://upload-images.jianshu.io/upload_images/280482-947492f9b5636b64.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>看上去很复杂吧，其实理解了就没那么多东西，我画画的水平有限😅。</p>
+<p>有个问题很多人都想知道，我一开始看内存这部分的时候也很着急：linux用户程序里边用的是什么地址？我先说答案：是逻辑地址。但很多书里边讲linux虚拟内存的分布，跟程序里用到的地址是一模一样的啊？其实linux用户程序中的地址是逻辑地址中的偏移，只不过linux把所有段的基址都设为0，这样段内偏移就跟线性地址一样了（因为段基址都是0啊，段偏移加上0还是段偏移）。为什么linux要把所有段基址都设为0呢？其实分段和分页都是对内存的分隔和保护，从用途上来说是重复的，分页更简单些，所有linux就只用了分页来实现内存保护。</p>
+<p>还有另一个问题：linux中用户进程看到的内存都是一样的，0~4G，这是如何实现的？答案是基于分页，linux给每个进程都维护一个分页映射规则，每个分页规则对应一种线性地址到物理地址的映射，这样每个进程看到的都是同样的线性地址，但是后边对应的物理地址各不相同。</p>
+<p>内存管理是linux内核中最复杂的系统之一，除了逻辑地址到线性地址再到物理地址的映射外，还有很多其他的特性辅助操作系统对物理内存实现管理，比如分段逻辑实现时用到的GDT、LDT、IDT、TSS、6个段寄存器，分页逻辑实现时用到的页目录、页表、页帧、CR3、PAE，CPU和物理内存之间的高速缓存等。骨架已经理清楚了，其他的理解就慢慢往里加吧。</p>
+<hr>
+<p>参考：</p>
+<ol>
+<li><a href="http://ilinuxkernel.com/?p=1276，讲linux内核的大牛，思路清晰，文笔优美。" target="_blank" rel="noopener">http://ilinuxkernel.com/?p=1276，讲linux内核的大牛，思路清晰，文笔优美。</a></li>
+<li>《Linux内核设计与实现》Robert Love，极好的内核入门书。</li>
+<li>《深入Linux内核架构》(德)Wolfgang.Mauerer，深入细节1。</li>
+<li>《Understanding the Linux Kernel 》3rd_Edition，Daniel P. Bovet and Marco Cesati，深入细节2。</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/os/" rel="tag"># os</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/12/《题龙阳县青草湖》——唐温如/" rel="next" title="《题龙阳县青草湖》  ——唐温如">
+                <i class="fa fa-chevron-left"></i> 《题龙阳县青草湖》  ——唐温如
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/13/用到的calibre/" rel="prev" title="用到的calibre">
+                用到的calibre <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">suntus</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">77</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">suntus</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+  
+  <script id="dsq-count-scr" src="https://https-suntus-github-io.disqus.com/count.js" async></script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://suntus.github.io/2017/08/14/逻辑地址，线性地址，物理地址/";
+    this.page.identifier = "2017/08/14/逻辑地址，线性地址，物理地址/";
+    this.page.title = '逻辑地址，线性地址，物理地址';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://https-suntus-github-io.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    loadComments();
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

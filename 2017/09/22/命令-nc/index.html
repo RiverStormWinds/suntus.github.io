@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="netcat——瑞士军刀 1. 功能 TCP服务端客户端 网络测试 ssh的SOCKS或HTTP代理 简单的端口扫描…">
+<meta name="keywords" content="linux,cli">
+<meta property="og:type" content="article">
+<meta property="og:title" content="命令_nc">
+<meta property="og:url" content="http://suntus.github.io/2017/09/22/命令-nc/index.html">
+<meta property="og:site_name" content="Morning~Sun。">
+<meta property="og:description" content="netcat——瑞士军刀 1. 功能 TCP服务端客户端 网络测试 ssh的SOCKS或HTTP代理 简单的端口扫描…">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-09-22T08:35:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="命令_nc">
+<meta name="twitter:description" content="netcat——瑞士军刀 1. 功能 TCP服务端客户端 网络测试 ssh的SOCKS或HTTP代理 简单的端口扫描…">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Morning~Sun。" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://suntus.github.io/2017/09/22/命令-nc/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>命令_nc | Morning~Sun。</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-55322469-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-55322469-1');
+  </script>
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Morning~Sun。</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">ha</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://suntus.github.io/2017/09/22/命令-nc/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="suntus">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Morning~Sun。">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">命令_nc
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: Sep 22nd Fri 2017 16:19 16:19:37" itemprop="dateCreated datePublished" datetime="2017-09-22T16:19:37+08:00">Sep 22nd Fri 2017 16:19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: Sep 22nd Fri 2017 16:35 16:35:06" itemprop="dateModified" datetime="2017-09-22T16:35:06+08:00">Sep 22nd Fri 2017 16:35</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <a href="/2017/09/22/命令-nc/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">Comments: </span> <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/09/22/命令-nc/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>netcat——瑞士军刀</p>
+<h1 id="1-功能"><a href="#1-功能" class="headerlink" title="1. 功能"></a>1. 功能</h1><ol>
+<li>TCP服务端客户端</li>
+<li>网络测试</li>
+<li>ssh的SOCKS或HTTP代理</li>
+<li>简单的端口扫描<br>…<a id="more"></a>
+</li>
+</ol>
+<h1 id="2-一些命令"><a href="#2-一些命令" class="headerlink" title="2. 一些命令"></a>2. 一些命令</h1><ul>
+<li>-4：只使用IPv4地址</li>
+<li>-6：只是用IPv6地址</li>
+<li>-b：允许广播</li>
+<li>-C：使用CRLF作为行的结尾</li>
+<li>-D：启动debug</li>
+<li>-d：不从标准输入中读取</li>
+<li>-I length：设置TCP接收缓冲区大小</li>
+<li>-i interval：在发送和接收数据包之间设置时间间隔，也在连接到多个端口的时候设置时间间隔</li>
+<li>-k: 强制nc在连接到1个端口之后监听等待1个连接到来。跟-l配合使用</li>
+<li>-l: 监听模式</li>
+<li>-n：不在任何地址、主机名、端口上做DNS（直接是数字形式的）</li>
+<li>-O length: 设置TCP发送缓冲区大小</li>
+<li>-P proxy_username: 连接到proxy的时候提供用户名来验证</li>
+<li>-p source_port：设置源端口</li>
+<li>-q seconds: 在标准输入发送EOF后，等待这些秒，如果是负数，就一直等下去</li>
+<li>-r: 让源/目的端口随机，不让在一个范围内分配</li>
+<li>-S：开启RFC 2385 TCP MD5 signature option</li>
+<li>-s source: 设置源地址，如果是unix domain socket，就指定文件</li>
+<li>-T toskeyword：改变IPv4的TOS字段</li>
+<li>-U：使用unix domain socket</li>
+<li>-u：使用udp，而不是默认的TCP。不用-s指定的话，会在/tmp目录下新建临时文件</li>
+<li>-V rtable: 设置使用的路由表</li>
+<li>-v: verbose输出</li>
+<li>-w timeout: 向外连接的时候设置超时时间</li>
+<li>-X proxy_protocol: 设置代理协议，4” (SOCKS v.4), “5” (SOCKS v.5) and “connect”(HTTPS proxy)。默认是5</li>
+<li>-x proxy_address[:port]：设置连接的代理地址</li>
+<li>-Z:DCCP模式</li>
+<li>-z: 只是扫描一下监听端口，而不发送任何数据。</li>
+</ul>
+<h1 id="3-简单的用法"><a href="#3-简单的用法" class="headerlink" title="3. 简单的用法"></a>3. 简单的用法</h1><h2 id="1-设置TCP服务端和客户端"><a href="#1-设置TCP服务端和客户端" class="headerlink" title="1. 设置TCP服务端和客户端"></a>1. 设置TCP服务端和客户端</h2><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">服务端：</span><br><span class="line"># rm -f /tmp/f; mkfifo /tmp/f</span><br><span class="line"># cat /tmp/f | /bin/sh -i <span class="number">2</span>&gt;&amp;<span class="number">1</span> | nc -l <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> <span class="number">1234</span> &gt; /tmp/f</span><br><span class="line"></span><br><span class="line">客户端：</span><br><span class="line">$ nc host.example.com <span class="number">1234</span></span><br><span class="line">$ (shell prompt from host.example.com)</span><br></pre></td></tr></table></figure>
+<h2 id="2-文件传输"><a href="#2-文件传输" class="headerlink" title="2. 文件传输"></a>2. 文件传输</h2><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">一端</span><br><span class="line">$ nc -l <span class="number">1234</span> &gt; filename.out</span><br><span class="line"></span><br><span class="line">另一端：</span><br><span class="line">$ nc host<span class="selector-class">.example</span><span class="selector-class">.com</span> <span class="number">1234</span> &lt; filename.<span class="keyword">in</span></span><br></pre></td></tr></table></figure>
+<h2 id="3-连接服务器"><a href="#3-连接服务器" class="headerlink" title="3. 连接服务器"></a>3. 连接服务器</h2><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ nc [-C] localhost <span class="number">25</span> &lt;&lt; EOF</span><br><span class="line">HELO host<span class="selector-class">.example</span><span class="selector-class">.com</span></span><br><span class="line">MAIL FROM:&lt;user@host<span class="selector-class">.example</span><span class="selector-class">.com</span>&gt;</span><br><span class="line">RCPT TO:&lt;user2@host<span class="selector-class">.example</span><span class="selector-class">.com</span>&gt;</span><br><span class="line">DATA</span><br><span class="line">Body of email.</span><br><span class="line">.</span><br><span class="line">QUIT</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+<h2 id="4-端口扫描"><a href="#4-端口扫描" class="headerlink" title="4. 端口扫描"></a>4. 端口扫描</h2><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ nc -zv host<span class="selector-class">.example</span><span class="selector-class">.com</span> <span class="number">20</span>-<span class="number">30</span></span><br><span class="line">$ nc -zv host<span class="selector-class">.example</span><span class="selector-class">.com</span> <span class="number">80</span> <span class="number">20</span> <span class="number">22</span></span><br></pre></td></tr></table></figure>
+<hr>
+<p>参考:</p>
+<ol>
+<li>man nc</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/linux/" rel="tag"># linux</a>
+          
+            <a href="/tags/cli/" rel="tag"># cli</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/22/shell IO重定向/" rel="next" title="shell IO重定向">
+                <i class="fa fa-chevron-left"></i> shell IO重定向
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/20/nginx图集/" rel="prev" title="nginx图集">
+                nginx图集 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">suntus</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">77</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-功能"><span class="nav-text">1. 功能</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-一些命令"><span class="nav-text">2. 一些命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-简单的用法"><span class="nav-text">3. 简单的用法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-设置TCP服务端和客户端"><span class="nav-text">1. 设置TCP服务端和客户端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-文件传输"><span class="nav-text">2. 文件传输</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-连接服务器"><span class="nav-text">3. 连接服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-端口扫描"><span class="nav-text">4. 端口扫描</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">suntus</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+  
+  <script id="dsq-count-scr" src="https://https-suntus-github-io.disqus.com/count.js" async></script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://suntus.github.io/2017/09/22/命令-nc/";
+    this.page.identifier = "2017/09/22/命令-nc/";
+    this.page.title = '命令_nc';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://https-suntus-github-io.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    loadComments();
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
