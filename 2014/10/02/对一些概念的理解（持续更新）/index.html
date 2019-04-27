@@ -104,7 +104,7 @@
 <meta property="og:site_name" content="Morning~Sun。">
 <meta property="og:description" content="不是标准理解，也不是全面理解">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-01-23T03:02:08.000Z">
+<meta property="og:updated_time" content="2019-04-27T08:43:06.860Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="对一些概念的理解（持续更新）">
 <meta name="twitter:description" content="不是标准理解，也不是全面理解">
@@ -380,7 +380,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-01-23 11:02 11:02:08" itemprop="dateModified" datetime="2018-01-23T11:02:08+08:00">2018-01-23 11:02</time>
+                <time title="修改时间：2019-04-27 16:43 16:43:06" itemprop="dateModified" datetime="2019-04-27T16:43:06+08:00">2019-04-27 16:43</time>
               
             
           </span>
@@ -483,6 +483,8 @@
 <li><p>一定要记得初始化。。。——suntus</p>
 </li>
 <li><p>全局未初始化变量和局部未初始化的static变量默认都是0或NULL，为了节省编译后文件的大小，C就把这些变量放到BSS段中(Block Started Symbol，也有人叫Better Save Space)。</p>
+</li>
+<li><p>终端和串行线路。串行线路发送来的数据，内核接收处理后会传递给进程，进程发送出去的数据，内核会接收并转给串行线路，再发出去；键盘和屏幕相当于一个终端，键盘发来的数据，内核接收处理后传递给进程(shell程序或其他)；进程发送的数据，内核接收后会转发给屏幕，显示出来。所以键盘和屏幕就相当于一个串行线路的发送端和接收端。</p>
 </li>
 </ol>
 
