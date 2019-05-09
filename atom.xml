@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://suntus.github.io/"/>
-  <updated>2017-12-20T01:26:54.000Z</updated>
+  <updated>2019-05-09T11:25:00.260Z</updated>
   <id>http://suntus.github.io/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>HKDF算法</title>
+    <link href="http://suntus.github.io/2019/05/09/HKDF%E7%AE%97%E6%B3%95/"/>
+    <id>http://suntus.github.io/2019/05/09/HKDF算法/</id>
+    <published>2019-05-09T11:14:44.000Z</published>
+    <updated>2019-05-09T11:25:00.260Z</updated>
+    
+    <content type="html"><![CDATA[<p>tls1.3中关于密钥生成的重要的基础算法，跟密钥推导密切相关。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;tls1.3中关于密钥生成的重要的基础算法，跟密钥推导密切相关。&lt;/p&gt;
+
+      
+    
+    </summary>
+    
+    
+      <category term="tls" scheme="http://suntus.github.io/tags/tls/"/>
+    
+  </entry>
   
   <entry>
     <title>顺时针规则--C语言声明</title>
@@ -433,28 +457,6 @@
     
     
       <category term="os" scheme="http://suntus.github.io/tags/os/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>《Orange&#39;s：一个操作系统的实现》</title>
-    <link href="http://suntus.github.io/2017/08/12/%E3%80%8AOrange-s%EF%BC%9A%E4%B8%80%E4%B8%AA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%AE%9E%E7%8E%B0%E3%80%8B/"/>
-    <id>http://suntus.github.io/2017/08/12/《Orange-s：一个操作系统的实现》/</id>
-    <published>2017-08-12T14:47:23.000Z</published>
-    <updated>2018-01-09T07:44:55.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>　　真的是挺好的一本书，从最基础的boot一直讲到进程调度、文件系统、内存管理，最最重要的是每一步都能自己动手实践，不止理解了概念，还对过程有了自己的感性认识，这是别的操作系统书里很难有的。<a id="more"></a><br>　　经过这些，对计算机如何工作理解的更深刻了。CPU从硬盘中将文件读入到内存，数据和代码都存在在内存，因为涉及到保护之类的，这些内容按段分布，代码控制CPU的逻辑流向。中断让CPU能更及时且准确的处理外来任务。<br>　　学习操作系统最大的感受，一个是CPU如何跟各个外设进行交互，另一个就是事无巨细都要一点点去实现，要对整个系统完全掌控才心里有底。<br>　　目前我觉得学习操作系统的顺序应该是了解其中的几个基本概念：文件系统、内存管理、进程调度、中断机制，然后开始从boot了解，一步步串起来，才会在整个过程中不那么艰难，看完其实操作系统也就那么回事儿了。<br> 　　这是对里边涉及到的一些概念的印象，还有待充实。<br><img src="http://upload-images.jianshu.io/upload_images/280482-23c52d7b89998330.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Orange&#39;s：一个操作系统的实现"></p><hr><ol><li>IA32 CPU的数据总体结构：<br><img src="http://upload-images.jianshu.io/upload_images/280482-23ffe6a8354e95a9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="CPU的数据结构"></li><li>GDT的作用是用来提供段式存储机制，这种机制是通过段寄存器和GDT中的描述符共同提供的。</li><li>描述符的种类：<ul><li>代码段描述符</li><li>数据段描述符</li><li>系统段描述符</li><li>门描述符</li></ul></li><li>IA32的分段机制中，特权级共有4个级别，从高到低分别是0，1，2，3。数字越小表示的特权级越大</li><li><p>处理器通过识别CPL,DPL,RPL这3中特权级进行特权级检验<br><strong>CPL: current privilege level</strong>，当前执行的程序或任务的特权级。存储在cs和ss的第0位和第1位上。通常，CPL等于代码所在的段的特权级，当程序转移到不同特权级的代码段时，处理器将改变CPL。一致代码段可以被相同或者更低特权级的代码访问。当处理器访问一个与CPL特权级不同的一致代码段时，CPL不会被改变。<br><strong>RPL: requested privilege level</strong>.存储在段选择子的第0和第1位。处理器通过检查RPL和CPL来确认一个访问请求是否合法。RPL占主导。<br><strong>DPL: descriptor privilege level</strong>，表示段或者门的特权级。存储在段或门描述符的DPL字段。当当前代码段试图访问一个段或门时，DPL将会和CPL以及段或门选择子的RPL相比较，根据段或门类型的不同，DPL将会被区别对待：</p><ul><li>数据段：DPL规定了可以访问此段的最低特权级。</li><li>非一致代码段（不使用调用门的情况下）：DPL规定访问此段的特权级。比如，一个非一致代码段的特权级为0，那么只有CPL为0的程序才能访问它。</li><li>调用门：DPL规定了当前执行的程序或者任务可以访问此调用门的最低特权级。</li><li>一致代码段和通过调用门访问的非一致代码段：DPL规定了访问此段的最高特权级。比如一个一致代码段的DPL是2，那么CPL为0和1的程序将无法访问此段。</li><li>TSS: DPL规定了可以访问此TSS的最低特权级。</li></ul></li><li><p>程序控制转移的发生：<code>jmp, call, ret, sysenter, sysexit, int n, iret</code>，或者中断、异常 </p></li><li>jmp、call指令可以实现4种转移：<ul><li>目标操作数包含目标代码段的段选择子</li><li>目标操作数指向一个包含目标代码段选择子的调用门描述符 </li><li>目标操作数指向一个包含目标代码段选择子的TSS</li><li>目标操作数指向一个任务门，这个任务门指向一个包含目标代码段选择子的TSS</li></ul></li><li>门描述符种类<ul><li>调用门 (call gates)</li><li>中断门（interrupt gates）</li><li>陷阱门（trap gates）</li><li>任务门（task gates）</li></ul></li><li>每个任务最多可能在4个特权级间转移，所以每个任务实际上需要4个堆栈，这时候需要TSS（task-state stack）来存储。</li><li>8259A芯片用于处理外部中断，可设置优先级，可屏蔽</li><li><img src="http://upload-images.jianshu.io/upload_images/280482-004fd591f38e870e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="一致代码段说明"><ul><li>一致代码段是给低特权级执行高特权级代码提供的一条通道，没有这条通道，从低到高或者反过来都不能执行</li><li>数据段都是非一致的，但是高的可以无条件访问低的数据段</li></ul></li><li>系统一开始进入的是0，也就是最高特权级，往特权级低的方向移动使用ret，往高处移动使用call，一个任务最多会用到4个特权级，而TSS只是在低特权级到高特权级移动的时候才会用到，所以TSS只会保存前三个。</li><li>分页是CPU提供的功能，使用两个东西，PDE和PTE，一个PDE和相应的PTE组成一套对应关系，说明一种线性地址和物理地址的对应关系。逻辑地址到线性地址用到的是分段机制。<br>线性地址提供的相当于一个胶水层，将上层应用（程序使用的逻辑地址）跟下层物理实现（CPU提供的物理地址）分割开来<br><img src="http://upload-images.jianshu.io/upload_images/280482-e3d92c595409a785.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="分页地址转换"><br>因为有多套不同的（PDE，PTE），所以形同的线性地址可能就对应不同的物理地址，这也就是常说的操作系统提供的统一内存空间。</li><li>IDT的作用是将每一个中断向量和描述符对应起来。</li><li>C调用约定：后面的参数先入栈，调用者负责清理堆栈。在处理可变参数时C调用约定表现良好，因为只有调用者知道此次调用包含了几个参数，于是可以方便清理堆栈</li><li>用到的芯片<ul><li><strong>8259A</strong>：处理中断</li><li><strong>8253</strong>：PIT（programmable interval timer），可编程定时器</li></ul></li><li>敲击键盘有两方面的含义：动作和内容。动作：按下、保持按住的状态、放开；内容：字母键、数字键、回车和其他键。</li><li>tty设备跟普通文件的不同：1.怎样才算“输入结束”，是每次键盘敲击之后都算结束，还是等回车才算结束，或者其他；2. 是否要让文件系统等待输入过程结束。</li></ol><hr><p>于渊</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;　　真的是挺好的一本书，从最基础的boot一直讲到进程调度、文件系统、内存管理，最最重要的是每一步都能自己动手实践，不止理解了概念，还对过程有了自己的感性认识，这是别的操作系统书里很难有的。
-    
-    </summary>
-    
-    
-      <category term="os" scheme="http://suntus.github.io/tags/os/"/>
-    
-      <category term="读过的书" scheme="http://suntus.github.io/tags/%E8%AF%BB%E8%BF%87%E7%9A%84%E4%B9%A6/"/>
     
   </entry>
   
