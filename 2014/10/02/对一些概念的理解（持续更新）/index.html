@@ -104,7 +104,7 @@
 <meta property="og:site_name" content="Morning~Sun。">
 <meta property="og:description" content="不是标准理解，也不是全面理解">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-04-27T08:43:06.860Z">
+<meta property="og:updated_time" content="2019-05-09T07:21:25.691Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="对一些概念的理解（持续更新）">
 <meta name="twitter:description" content="不是标准理解，也不是全面理解">
@@ -380,7 +380,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-04-27 16:43 16:43:06" itemprop="dateModified" datetime="2019-04-27T16:43:06+08:00">2019-04-27 16:43</time>
+                <time title="修改时间：2019-05-09 15:21 15:21:25" itemprop="dateModified" datetime="2019-05-09T15:21:25+08:00">2019-05-09 15:21</time>
               
             
           </span>
@@ -450,10 +450,12 @@
 </li>
 <li><p>跨平台通信中需要考虑：流数据在64位与32位体系间的兼容；流数据中字符串的编码方式；流数据在不同编程语言之间（如java和c/c++）的兼容。</p>
 </li>
-</ol>
-<p>18.<br>　　<em>任何c变量的声明都由两部分组成：类型以及一组类似表达式的声明符号(declarator)。声明符从表面上看与表达式有些类似，对它求值应该返回一个声明中给定类型的结果。<br>——《c语言缺陷与陷阱》</em><br>19.<br>　　<em>对信号处理唯一安全的方法就是打印一条错误信息，然后<code>longjmp</code>退出或直接<code>exit</code>退出。<br>——《c语言缺陷与陷阱》</em></p>
-<p>20.<br>　　<em>严格表述的数学是一门系统的演绎科学，但在形成过程中的数学则是一门实验性的归纳科学。<br>——《怎样解题》G.波利亚</em></p>
-<ol start="21">
+<li><p><em>任何c变量的声明都由两部分组成：类型以及一组类似表达式的声明符号(declarator)。声明符从表面上看与表达式有些类似，对它求值应该返回一个声明中给定类型的结果。<br>——《c语言缺陷与陷阱》</em></p>
+</li>
+<li><p><em>对信号处理唯一安全的方法就是打印一条错误信息，然后<code>longjmp</code>退出或直接<code>exit</code>退出。<br>——《c语言缺陷与陷阱》</em></p>
+</li>
+<li><p><em>严格表述的数学是一门系统的演绎科学，但在形成过程中的数学则是一门实验性的归纳科学。<br>——《怎样解题》G.波利亚</em></p>
+</li>
 <li><p>在c程序中使用完用malloc族申请过来的变量时就立即释放，<strong>使用完就立即释放</strong>，有时候会避免一些出错。</p>
 </li>
 <li><p>基本的进程控制原语：<code>fork(), exec(), exit(), wait(), waitpid()</code></p>
@@ -485,6 +487,8 @@
 <li><p>全局未初始化变量和局部未初始化的static变量默认都是0或NULL，为了节省编译后文件的大小，C就把这些变量放到BSS段中(Block Started Symbol，也有人叫Better Save Space)。</p>
 </li>
 <li><p>终端和串行线路。串行线路发送来的数据，内核接收处理后会传递给进程，进程发送出去的数据，内核会接收并转给串行线路，再发出去；键盘和屏幕相当于一个终端，键盘发来的数据，内核接收处理后传递给进程(shell程序或其他)；进程发送的数据，内核接收后会转发给屏幕，显示出来。所以键盘和屏幕就相当于一个串行线路的发送端和接收端。</p>
+</li>
+<li><p>函数只需要做自己要做的那个件事，至于判断要不要做，交给调用者去判断。比如存储一个数据，只需要验证输入参数是否正确，是否存储到位，返回给调用者一个成功或者失败的消息——什么情况下存储，什么情况下不存储，要交给调用者去判断</p>
 </li>
 </ol>
 
