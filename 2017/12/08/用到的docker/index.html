@@ -416,7 +416,7 @@
       
         <p>都是在ubuntu系统中<br><a id="more"></a></p>
 <h2 id="1-修改container时区"><a href="#1-修改container时区" class="headerlink" title="1.修改container时区"></a>1.修改container时区</h2><figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 添加shell命令</span><br><span class="line">echo <span class="string">"Asia/Shanghai"</span> &gt; /etc/timezone </span><br><span class="line">dpkg-reconfigure -f noninteractive tzdata </span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">## <span class="number">2.</span>同步主机时区</span><br><span class="line">启动时挂载`/etc/localtime`文件</span><br></pre></td></tr></table></figure>
-<p>docker run -it -v /etc/localtime:/etc/localtime <img><br><code>`</code></p>
+<p>docker run -it -v /etc/localtime:/etc/localtime <img><br>```</p>
 <hr>
 <p>参考</p>
 <ol>
@@ -567,7 +567,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">78</span>
+                    <span class="site-state-item-count">79</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>

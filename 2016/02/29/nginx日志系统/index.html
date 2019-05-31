@@ -420,6 +420,7 @@
 <li>记录http框架信息的</li>
 <li>记录访问信息的</li>
 </ol>
+<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -451,6 +452,7 @@
 </tr>
 </tbody>
 </table>
+</div>
 <p><em><span id="1">[1]</span>关于默认文件的说明:1和2默认记录在相同文件，也可以不同文件。配置项也相同，都是error_log，只不过作用域不同。</em></p>
 <h3 id="二、主要人物都使用的哪种类型log"><a href="#二、主要人物都使用的哪种类型log" class="headerlink" title="二、主要人物都使用的哪种类型log"></a>二、主要人物都使用的哪种类型log</h3><h4 id="1-ngx-cycle-t"><a href="#1-ngx-cycle-t" class="headerlink" title="1. ngx_cycle_t"></a>1. ngx_cycle_t</h4><p>  用的就是初始化的时候设置的,<code>log = ngx_log_init(ngx_prefix);</code>从<code>init_cycle</code>(只在初始化的时候用到)再传到<code>ngx_cycle</code>。</p>
 <h4 id="2-ngx-event-t"><a href="#2-ngx-event-t" class="headerlink" title="2. ngx_event_t"></a>2. ngx_event_t</h4><p>  作为ls的c的rev的log是从c中拿过来的，而作为ls的c的log是从ls拿过来的：</p>
@@ -614,7 +616,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">78</span>
+                    <span class="site-state-item-count">79</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>

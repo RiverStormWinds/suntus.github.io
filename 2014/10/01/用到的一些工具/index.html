@@ -420,11 +420,11 @@
 <ol>
 <li>cloc统计代码行数（apt）.</li>
 <li><p>valgrind, 检测c程序内存泄漏</p>
-<pre><code>valgrind --tool=memcheck --leak-check=full --suppressions=vg.supp someprog
+<pre><code> valgrind --tool=memcheck --leak-check=full --suppressions=vg.supp someprog
 </code></pre></li>
 </ol>
 <p>关于zmq使用的代码:<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">vg.supp</span><br><span class="line">&#123;</span><br><span class="line">   &lt;socketcall_sendto&gt;</span><br><span class="line">   <span class="symbol">Memcheck:</span>Param</span><br><span class="line">   socketcall.sendto(msg)</span><br><span class="line">   <span class="function"><span class="keyword">fun</span>:<span class="title">send</span></span></span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br><span class="line">&#123;</span><br><span class="line">   &lt;socketcall_sendto&gt;</span><br><span class="line">   <span class="symbol">Memcheck:</span>Param</span><br><span class="line">   socketcall.send(msg)</span><br><span class="line">   <span class="function"><span class="keyword">fun</span>:<span class="title">send</span></span></span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<ol start="3">
+<ol>
 <li><p><code>tail file.name -f</code> 跟踪文件，查看在文件尾插入日志记录的时候很用。</p>
 </li>
 <li><p><code>git config --global alias.lg &quot;log --color --graph --pretty=format:&#39;%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)&lt;%an&gt;%Creset&#39; --abbrev-commit&quot;</code> git log 别名： git lg</p>
@@ -602,7 +602,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">78</span>
+                    <span class="site-state-item-count">79</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>

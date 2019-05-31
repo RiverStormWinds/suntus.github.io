@@ -104,6 +104,9 @@
 <meta property="og:site_name" content="Morning~Sun。">
 <meta property="og:description" content="一直不理解换行符，这次弄清楚。">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://suntus.github.io/img/crlf.png">
+<meta property="og:image" content="http://suntus.github.io/img/crlf2.png">
+<meta property="og:image" content="http://suntus.github.io/img/crlf3.png">
 <meta property="og:image" content="http://suntus.github.io/img/crlf4.png">
 <meta property="og:image" content="http://suntus.github.io/img/crlf5.png">
 <meta property="og:image" content="http://suntus.github.io/img/crlf6.png">
@@ -111,7 +114,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="换行符问题">
 <meta name="twitter:description" content="一直不理解换行符，这次弄清楚。">
-<meta name="twitter:image" content="http://suntus.github.io/img/crlf4.png">
+<meta name="twitter:image" content="http://suntus.github.io/img/crlf.png">
 
 
 
@@ -424,11 +427,11 @@
 <li>换行： line feed，缩写为LF</li>
 </ul>
 <h3 id="关于“回车”和“换行”这两个概念的来历"><a href="#关于“回车”和“换行”这两个概念的来历" class="headerlink" title="关于“回车”和“换行”这两个概念的来历"></a>关于“回车”和“换行”这两个概念的来历</h3><p>　　原本确认键这个术语用于打字机的扳手，若打字机的语言是由左至右书写的语言，回车用于将承载装纸滚筒的机架(carriage)移到最右边，以便令印字位置对准一行的开头，同时顺便滚动转筒，换到下一行(line feed)。最开始的打字机如下：</p>
-<p>&lt;img title=”打字机”src=”/img/crlf.png” width=”50%” height=”50%”&gt;</p>
+<p><img title="打字机" src="/img/crlf.png" width="50%" height="50%"></p>
 <p>　　第一个有动力的回车功能在1960年由Smith Corona加入电打字机。因为在打字机上“回车”操作比“换行”操作更费时，“回车”就排在了“换行”前边。</p>
 <p>　　后来，计算机发明了，这两个概念也就被般到了计算机上。那时，存储器很贵，一些科学家认为在每行结尾加两个字符太浪费了，加一个就可以。于是，就出现了分歧。做Unix的一般比较懒，每行结尾只有“＜换行＞”，即“\n”；Windows系统里面，每行结尾是“&lt;回车&gt;&lt;换行&gt;”，即“\r\n”；Mac系统里，每行结尾是“&lt;回车&gt;”，即“\r”。一个直接后果是，Unix/Mac系统下的文件在Windows里打开的话，所有文字会变成一行；而Windows里的文件在Unix/Mac下打开的话，在每行的结尾可能会多出一个^M符号：</p>
-<p>&lt;img title=”windows中的文件在mac下打开”src=”/img/crlf2.png” width=”50%” height=”50%”&gt;</p>
-<p>&lt;img title=”mac中的文件在windows下打开”src=”/img/crlf3.png” width=”50%” height=”50%”&gt;</p>
+<p><img title="windows中的文件在mac下打开" src="/img/crlf2.png" width="50%" height="50%"></p>
+<p><img title="mac中的文件在windows下打开" src="/img/crlf3.png" width="50%" height="50%"></p>
 <h3 id="其他地方的换行"><a href="#其他地方的换行" class="headerlink" title="其他地方的换行"></a>其他地方的换行</h3><p>　　上边说的是在不同操作系统中，系统默认的换行符。在Ｃ语言中，用转义字符”\n”来表示换行：</p>
 <figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf(<span class="string">"Hello\nworld"</span>)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
 <p>在输出到文件中时，C语言会根据不同的系统将换行符转换成不同的字符。比如上一句在windows中和在mac中各显示如下：</p>
@@ -441,6 +444,7 @@
 <p>现在的编辑器一般都可以自己设定换行符，比如sublime text:</p>
 <p><img title="sublime text设定换行符" src="/img/crlf5.png" width="50%" height="50%"><br>还有atom：<br><img title="atom设定换行符" src="/img/crlf6.png" width="50%" height="50%"></p>
 <h3 id="总结一下"><a href="#总结一下" class="headerlink" title="总结一下"></a>总结一下</h3><p>　　现在我们知道最早的回车换行来自机械打字机，后来到电传打字机，再到ASCII，最后到各种操作系统，就形成了我们现在看到的”回车”跟”换行”。</p>
+<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -479,6 +483,7 @@
 </tr>
 </tbody>
 </table>
+</div>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ol>
 <li>这个讲的比较乱: <a href="http://blog.csdn.net/tskyfree/article/details/8121951" target="_blank" rel="noopener">http://blog.csdn.net/tskyfree/article/details/8121951</a></li>
 <li>一个小故事: <a href="http://www.cnblogs.com/faraway/archive/2009/03/05/1403649.html" target="_blank" rel="noopener">http://www.cnblogs.com/faraway/archive/2009/03/05/1403649.html</a></li>
@@ -631,7 +636,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">78</span>
+                    <span class="site-state-item-count">79</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>

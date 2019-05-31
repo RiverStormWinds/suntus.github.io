@@ -421,54 +421,54 @@ NAT          Y             Y               Y             N
 host-only     Y             N               N             N
 </code></pre><ol>
 <li><p>处理network manager<br>　　linux别的版本中不知道，在在ubuntu12.04中搭建网桥是要关掉network manager，就是平时联网用的那个东西：</p>
-<pre><code>sudo service network-manager stop
+<pre><code> sudo service network-manager stop
 </code></pre><p>平时关闭开启服务都用｀service　someting　stop/start/restart｀，要再打开只用把stop改成start就可以。有人说也可以用：</p>
-<pre><code>sudo stop network-manager
+<pre><code> sudo stop network-manager
 </code></pre><p>这个命令比较新，还是不推荐了。关闭该服务是因为它会重置你手动配置的网桥。</p>
 </li>
 <li><p>配置文件<br>　　设置网桥有两种情况，一个是本身联网使用动态ip地址，二是使用静态ip地址。一般都是使用动态的，就先说动态的：</p>
-<pre><code>sudo gedit /etc/network/interfaces
+<pre><code> sudo gedit /etc/network/interfaces
 </code></pre><p>用vim还是gedit都行，只要能改。如果开始没动该文件，你会看到它像这样：</p>
-<pre><code>auto lo
-iface lo inet loopback
+<pre><code> auto lo
+ iface lo inet loopback
 </code></pre><p>要改成这样：</p>
-<pre><code>auto lo
-iface lo inet loopback
+<pre><code> auto lo
+ iface lo inet loopback
 
-# The primary network interface
-#auto eth0
-#iface eth0 inet dhcp
+ # The primary network interface
+ #auto eth0
+ #iface eth0 inet dhcp
 
-auto br0
-iface br0 inet dhcp
-        bridge_ports eth0
-        bridge_fd 9
-        bridge_hello 2
-        bridge_maxage 12
-        bridge_stp off
+ auto br0
+ iface br0 inet dhcp
+         bridge_ports eth0
+         bridge_fd 9
+         bridge_hello 2
+         bridge_maxage 12
+         bridge_stp off
 </code></pre><p>有的源文件中有<code>auto eth0</code> <code>iface eth0 inet dhcp</code>这两行，注释掉。<br>接下来静态的，只要把interfaces文件修改成这样：</p>
-<pre><code>auto lo
-iface lo inet loopback
+<pre><code> auto lo
+ iface lo inet loopback
 
-# The primary network interface
-#auto eth0
-#iface eth0 inet dhcp
+ # The primary network interface
+ #auto eth0
+ #iface eth0 inet dhcp
 
-auto br0
-iface br0 inet static
-        address 192.168.1.200
-        broadcast 192.168.1.255
-        netmask 255.255.255.0
-        gateway 192.168.1.254
-        bridge_ports eth0
-        bridge_fd 9
-        bridge_hello 2
-        bridge_maxage 12
-        bridge_stp off
+ auto br0
+ iface br0 inet static
+         address 192.168.1.200
+         broadcast 192.168.1.255
+         netmask 255.255.255.0
+         gateway 192.168.1.254
+         bridge_ports eth0
+         bridge_fd 9
+         bridge_hello 2
+         bridge_maxage 12
+         bridge_stp off
 </code></pre><p>地址那里设置成符合自己网络的地址。</p>
 </li>
 <li><p>重启联网服务</p>
-<pre><code>sudo /etc/init.d/networking restart
+<pre><code> sudo /etc/init.d/networking restart
 </code></pre><p>查是否设置成功: ｀$ifconfig｀<br>看到有br0之后就是网桥设置成功了。</p>
 </li>
 <li><p>遇到的问题</p>
@@ -476,8 +476,8 @@ iface br0 inet static
 </ol>
 <ul>
 <li>关闭network-manager后我试着重开启该服务，然后再关闭，告诉我`no such instance:    ，重启后解决。网上说的找到运行的进程杀掉，没试，因为我找到好几个跟这个服务相关的进程。</li>
-<li>出错后删除网桥步骤是：把修改的文件还原，再运行：<pre><code>#ip link set br0 down
-#brctl delbr br0
+<li>出错后删除网桥步骤是：把修改的文件还原，再运行：<pre><code>  #ip link set br0 down
+  #brctl delbr br0
 </code></pre>解决。</li>
 </ul>
 
@@ -616,7 +616,7 @@ iface br0 inet static
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">78</span>
+                    <span class="site-state-item-count">79</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>

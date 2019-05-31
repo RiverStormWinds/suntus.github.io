@@ -435,6 +435,7 @@
 <p>除了使用分段的方式划分内存外，还可以将物理内存直接划分为多个不同的页，称为页帧，一个物理页一般是4K大小，这样控制一页内的内存属性相同，多个不同的页可以使用不同的属性，就跟分段类似了，如下图：<br><img src="http://upload-images.jianshu.io/upload_images/280482-ad183344059e0d58.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
 <p>这时候会出现个新问题：CPU已经使用逻辑地址来划分段了，如何去实现分页呢？其实肯定也想到了，在逻辑地址和物理地址之间加一个抽象层接口，也就是我们要说的最后一个地址：线性地址，也叫虚拟地址。线性地址的位置在逻辑地址和物理地址之间，比如在讲linux内核的书里边常见有这样的图：<br><img src="http://upload-images.jianshu.io/upload_images/280482-e88812256a74ff18.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
 <p>CPU将逻辑地址按照分段逻辑转换成线性地址，再按分页逻辑转换成物理地址。这里的转换都是依靠CPU电路完成的，但是怎样分段，怎样分页是需要内核程序先规定好才行。CPU怎样进行分段和分页的就不细说了，<a href="http://ilinuxkernel.com/?p=1276" target="_blank" rel="noopener">这里</a>讲的真好，可以去看看。<br>我们来对比一下分段和分页：</p>
+<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -471,6 +472,7 @@
 </tr>
 </tbody>
 </table>
+</div>
 <p>好了，现在我们的CPU中地址关系如下：<br><img src="http://upload-images.jianshu.io/upload_images/280482-947492f9b5636b64.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>看上去很复杂吧，其实理解了就没那么多东西，我画画的水平有限😅。</p>
 <p>有个问题很多人都想知道，我一开始看内存这部分的时候也很着急：linux用户程序里边用的是什么地址？我先说答案：是逻辑地址。但很多书里边讲linux虚拟内存的分布，跟程序里用到的地址是一模一样的啊？其实linux用户程序中的地址是逻辑地址中的偏移，只不过linux把所有段的基址都设为0，这样段内偏移就跟线性地址一样了（因为段基址都是0啊，段偏移加上0还是段偏移）。为什么linux要把所有段基址都设为0呢？其实分段和分页都是对内存的分隔和保护，从用途上来说是重复的，分页更简单些，所有linux就只用了分页来实现内存保护。</p>
 <p>还有另一个问题：linux中用户进程看到的内存都是一样的，0~4G，这是如何实现的？答案是基于分页，linux给每个进程都维护一个分页映射规则，每个分页规则对应一种线性地址到物理地址的映射，这样每个进程看到的都是同样的线性地址，但是后边对应的物理地址各不相同。</p>
@@ -617,7 +619,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">78</span>
+                    <span class="site-state-item-count">79</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>

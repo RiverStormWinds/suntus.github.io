@@ -96,18 +96,18 @@
 
 
 
-  <meta name="description" content="1. 显示和设置系统日期和时间date [OPTION]… [+FORMAT]date [-u| –utc| -universal] [MMDDhhmm[[CC]UYY][.ss]] 2. 其实核心的只有1个功能：输入特定格式的时间，转换成自己想要的时间格式">
+  <meta name="description" content="1. 显示和设置系统日期和时间date [OPTION]… [+FORMAT]date [-u| —utc| -universal] [MMDDhhmm[[CC]UYY][.ss]] 2. 其实核心的只有1个功能：输入特定格式的时间，转换成自己想要的时间格式">
 <meta name="keywords" content="linux,cli">
 <meta property="og:type" content="article">
 <meta property="og:title" content="命令_date">
 <meta property="og:url" content="http://suntus.github.io/2017/09/20/命令_date/index.html">
 <meta property="og:site_name" content="Morning~Sun。">
-<meta property="og:description" content="1. 显示和设置系统日期和时间date [OPTION]… [+FORMAT]date [-u| –utc| -universal] [MMDDhhmm[[CC]UYY][.ss]] 2. 其实核心的只有1个功能：输入特定格式的时间，转换成自己想要的时间格式">
+<meta property="og:description" content="1. 显示和设置系统日期和时间date [OPTION]… [+FORMAT]date [-u| —utc| -universal] [MMDDhhmm[[CC]UYY][.ss]] 2. 其实核心的只有1个功能：输入特定格式的时间，转换成自己想要的时间格式">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2017-09-22T08:35:08.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="命令_date">
-<meta name="twitter:description" content="1. 显示和设置系统日期和时间date [OPTION]… [+FORMAT]date [-u| –utc| -universal] [MMDDhhmm[[CC]UYY][.ss]] 2. 其实核心的只有1个功能：输入特定格式的时间，转换成自己想要的时间格式">
+<meta name="twitter:description" content="1. 显示和设置系统日期和时间date [OPTION]… [+FORMAT]date [-u| —utc| -universal] [MMDDhhmm[[CC]UYY][.ss]] 2. 其实核心的只有1个功能：输入特定格式的时间，转换成自己想要的时间格式">
 
 
 
@@ -414,11 +414,12 @@
       
 
       
-        <h2 id="1-显示和设置系统日期和时间"><a href="#1-显示和设置系统日期和时间" class="headerlink" title="1. 显示和设置系统日期和时间"></a>1. 显示和设置系统日期和时间</h2><p>date [OPTION]… [+FORMAT]<br>date [-u| –utc| -universal] [MMDDhhmm[[CC]UYY][.ss]]</p>
+        <h2 id="1-显示和设置系统日期和时间"><a href="#1-显示和设置系统日期和时间" class="headerlink" title="1. 显示和设置系统日期和时间"></a>1. 显示和设置系统日期和时间</h2><p>date [OPTION]… [+FORMAT]<br>date [-u| —utc| -universal] [MMDDhhmm[[CC]UYY][.ss]]</p>
 <h2 id="2-其实核心的只有1个功能："><a href="#2-其实核心的只有1个功能：" class="headerlink" title="2. 其实核心的只有1个功能："></a>2. 其实核心的只有1个功能：</h2><p><strong><em>输入特定格式的时间，转换成自己想要的时间格式</em></strong></p>
 <a id="more"></a>
 <h3 id="2-1-输入使用-d，后边跟描述时间的文字"><a href="#2-1-输入使用-d，后边跟描述时间的文字" class="headerlink" title="2.1 输入使用-d，后边跟描述时间的文字"></a>2.1 输入使用-d，后边跟描述时间的文字</h3><p>比如<br>“Sun, 29 Feb 2004 16:21:42 -0800”, “2004-02-29 16:21:42” , “next Thursday”, “-10day”, “+10min”等等，该描述性的文字由指示日历的日期，时间的天，时间的时区，天的星期，相对时间，相对日期和数字组成。空字符串表示这天的开始。</p>
-<h3 id="2-2-输出使用-FORMAT，后边跟各种格式："><a href="#2-2-输出使用-FORMAT，后边跟各种格式：" class="headerlink" title="2.2 输出使用+FORMAT，后边跟各种格式："></a>2.2 输出使用+FORMAT，后边跟各种格式：</h3><p>%%: 符号%<br>%a: 本地星期缩写， Sun<br>%A: 本地星期全称， Sunday<br>%b: 本地月份缩写, Jan<br>%B: 本地月份全称, January<br>%c: 本地日期和时间, Thu Mar 3 23:-5:25 2005<br>%C: 世纪，类似%Y，DNA没有后两位, 20<br>%d: 月的第几天, 01<br>%D: 日期，%m/%d/%y<br>%e: 月的天数，用空格填充，类似%_d<br>%F: 完整的日期格式，类似%F-%m-%d<br>%g: ISO格式年的后两位<br>%G: ISO格式的年<br>%h: 跟%b一样<br>%H: 小时(00..23)<br>%I: 小时(01..12)<br>%j: 年的第几天(001..366)<br>%k: 小时，用空格填充(0..23); 类似%_H<br>%l: 小时，用空格填充(1..12) ； 类似%_I<br>%m: 月(01..12)<br>%M: 分钟(00..59)<br>%n: 换行<br>%N: 纳秒,nanoseconds(0000000000..999999999)<br>%p: 本地的AM或者PM<br>%P: 类似%p，但是是小写<br>%r：本地12小时制时钟时间  11:11:04 PM<br>%R: 24小时制的小时跟分钟，类似%H:%M<br>%s: 从1970-01-01 00:00:00 UTC开始的秒数，时间戳<br>%S: 秒(00..60)<br>%t: tab字符<br>%T: 时间，类似%H:%M:%S<br>%u: 星期的第几天(1..7),1是星期一<br>%U: 年的第几个星期(00..53)，周日是星期的开始<br>%V: ISO星期制，星期一是星期的开始（01..53）<br>%w: 星期的第几天(0..6)，0是星期天<br>%W: 年的第几个星期(00..53)，周一是星期的开始<br>%x:  本地日期表示(12/31/99)<br>%X: 本地时间表示(23:13:48)<br>%y: 年的后两位数字(00..99)<br>%Y: 年<br>另外还有几个符号，用于修饰<br>-  不填充<br>_ 用空格填充<br>0 用0填充<br>^ 用大写<br>#  用相反的大小写</p>
+<h3 id="2-2-输出使用-FORMAT，后边跟各种格式："><a href="#2-2-输出使用-FORMAT，后边跟各种格式：" class="headerlink" title="2.2 输出使用+FORMAT，后边跟各种格式："></a>2.2 输出使用+FORMAT，后边跟各种格式：</h3><p>%%: 符号%<br>%a: 本地星期缩写， Sun<br>%A: 本地星期全称， Sunday<br>%b: 本地月份缩写, Jan<br>%B: 本地月份全称, January<br>%c: 本地日期和时间, Thu Mar 3 23:-5:25 2005<br>%C: 世纪，类似%Y，DNA没有后两位, 20<br>%d: 月的第几天, 01<br>%D: 日期，%m/%d/%y<br>%e: 月的天数，用空格填充，类似%<em>d<br>%F: 完整的日期格式，类似%F-%m-%d<br>%g: ISO格式年的后两位<br>%G: ISO格式的年<br>%h: 跟%b一样<br>%H: 小时(00..23)<br>%I: 小时(01..12)<br>%j: 年的第几天(001..366)<br>%k: 小时，用空格填充(0..23); 类似%_H<br>%l: 小时，用空格填充(1..12) ； 类似%_I<br>%m: 月(01..12)<br>%M: 分钟(00..59)<br>%n: 换行<br>%N: 纳秒,nanoseconds(0000000000..999999999)<br>%p: 本地的AM或者PM<br>%P: 类似%p，但是是小写<br>%r：本地12小时制时钟时间  11:11:04 PM<br>%R: 24小时制的小时跟分钟，类似%H:%M<br>%s: 从1970-01-01 00:00:00 UTC开始的秒数，时间戳<br>%S: 秒(00..60)<br>%t: tab字符<br>%T: 时间，类似%H:%M:%S<br>%u: 星期的第几天(1..7),1是星期一<br>%U: 年的第几个星期(00..53)，周日是星期的开始<br>%V: ISO星期制，星期一是星期的开始（01..53）<br>%w: 星期的第几天(0..6)，0是星期天<br>%W: 年的第几个星期(00..53)，周一是星期的开始<br>%x:  本地日期表示(12/31/99)<br>%X: 本地时间表示(23:13:48)<br>%y: 年的后两位数字(00..99)<br>%Y: 年<br>另外还有几个符号，用于修饰<br>-  不填充
+</em> 用空格填充<br>0 用0填充<br>^ 用大写<br>#  用相反的大小写</p>
 <h2 id="3-几个例子："><a href="#3-几个例子：" class="headerlink" title="3. 几个例子："></a>3. 几个例子：</h2><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 输出今天开始时间</span></span><br><span class="line">date -d <span class="string">""</span></span><br><span class="line"><span class="comment"># 当前时间戳</span></span><br><span class="line">date +%s</span><br><span class="line"><span class="comment"># 输出好看的时间：2017-9-20 16:21:42</span></span><br><span class="line">date +<span class="string">"%F %T"</span></span><br><span class="line"><span class="comment"># 将时间戳转换成可读时间，对这里的时间戳前边要加@</span></span><br><span class="line">date -d @1505896166 +<span class="string">"%F %T"</span></span><br><span class="line"><span class="comment"># 输出10分钟前的时间戳</span></span><br><span class="line">date -d <span class="string">"-10min"</span> +%s</span><br></pre></td></tr></table></figure>
 <p>至于设置系统时间，加个-s就行了。</p>
 <hr>
@@ -571,7 +572,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">78</span>
+                    <span class="site-state-item-count">79</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>

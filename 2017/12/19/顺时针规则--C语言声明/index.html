@@ -429,13 +429,13 @@
 <li>括号内的永远优先!</li>
 </ol>
 <p>其实对英文来说就是不断在后边加定语，但对汉语来说，就需要不断在前边加定语。</p>
-<h2 id="1-简单声明"><a href="#1-简单声明" class="headerlink" title="1.简单声明"></a>1.简单声明</h2><pre><code>     +-------+
-     | +-+   |
-     | ^ |   |
-char *str[10];
- ^   ^   |   |
- |   +---+   |
- +-----------+
+<h2 id="1-简单声明"><a href="#1-简单声明" class="headerlink" title="1.简单声明"></a>1.简单声明</h2><pre><code>                 +-------+
+                 | +-+   |
+                 | ^ |   |
+            char *str[10];
+             ^   ^   |   |
+             |   +---+   |
+             +-----------+
 </code></pre><p>首先需要问的是：<code>str</code>是什么？</p>
 <blockquote>
 <p>str 是个…(str is an…)</p>
@@ -445,15 +445,15 @@ char *str[10];
 <li>继续，下一个是该行结尾<code>;</code>；继续，接下来是<code>char</code>，因此…<br>str是个大小是10、指向字符的指针的数组(str is an array 10 of pointers to char)</li>
 </ul>
 </blockquote>
-<h2 id="2-指向函数的指针的声明"><a href="#2-指向函数的指针的声明" class="headerlink" title="2.指向函数的指针的声明"></a>2.指向函数的指针的声明</h2><pre><code>     +--------------------+
-     | +---+              |
-     | |+-+|              |
-     | |^ ||              |
-char *(*fp)( int, float *);
- ^   ^ ^  ||              |
- |   | +--+|              |
- |   +-----+              |
- +------------------------+
+<h2 id="2-指向函数的指针的声明"><a href="#2-指向函数的指针的声明" class="headerlink" title="2.指向函数的指针的声明"></a>2.指向函数的指针的声明</h2><pre><code>                 +--------------------+
+                 | +---+              |
+                 | |+-+|              |
+                 | |^ ||              |
+            char *(*fp)( int, float *);
+             ^   ^ ^  ||              |
+             |   | +--+|              |
+             |   +-----+              |
+             +------------------------+
 </code></pre><p>还是一样，首先要问：<code>fp</code>是什么？</p>
 <blockquote>
 <p>fp 是个…(fp is a…)</p>
@@ -464,15 +464,15 @@ char *(*fp)( int, float *);
 <li>继续，遇到<code>;</code>；再继续，遇到了<code>char</code>，因此…<br>fp 是个指向传入参数是int和指向float的指针、返回值是指向char的指针的函数的指针(fp is a pointer to a function passing an int and a pointer to float returning a pointer to a char)</li>
 </ul>
 </blockquote>
-<h2 id="3-终极形态"><a href="#3-终极形态" class="headerlink" title="3.终极形态"></a>3.终极形态</h2><pre><code>      +-----------------------------+
-      |                  +---+      |
-      |  +---+           |+-+|      |
-      |  ^   |           |^ ||      |
-void (*signal(int, void (*fp)(int)))(int);
- ^    ^      |      ^    ^  ||      |
- |    +------+      |    +--+|      |
- |                  +--------+      |
- +----------------------------------+
+<h2 id="3-终极形态"><a href="#3-终极形态" class="headerlink" title="3.终极形态"></a>3.终极形态</h2><pre><code>                  +-----------------------------+
+                  |                  +---+      |
+                  |  +---+           |+-+|      |
+                  |  ^   |           |^ ||      |
+            void (*signal(int, void (*fp)(int)))(int);
+             ^    ^      |      ^    ^  ||      |
+             |    +------+      |    +--+|      |
+             |                  +--------+      |
+             +----------------------------------+
 </code></pre><p>依然是:<code>signal</code>是什么?<br>注意<code>signal</code>在括号中，需要先解决它</p>
 <ul>
 <li>顺时针移动，首先遇到<code>(</code>，因此…<blockquote>
@@ -517,7 +517,7 @@ void (*signal(int, void (*fp)(int)))(int);
 <hr>
 <p>C的复杂声明其实就不断加定语，但是这个定语在修饰的是哪个主语，需要按照顺时针/螺旋规则来解释。熟悉了就好。</p>
 <hr>
-<p>原文: <a href="http://c-faq.com/decl/spiral.anderson.html" target="_blank" rel="noopener">The <code></code>Clockwise/Spiral Rule’’</a></p>
+<p>原文: <a href="http://c-faq.com/decl/spiral.anderson.html" target="_blank" rel="noopener">The ``Clockwise/Spiral Rule’’</a></p>
 
       
     </div>
@@ -663,7 +663,7 @@ void (*signal(int, void (*fp)(int)))(int);
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">78</span>
+                    <span class="site-state-item-count">79</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
