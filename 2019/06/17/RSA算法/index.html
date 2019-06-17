@@ -96,18 +96,18 @@
 
 
 
-  <meta name="description" content="开篇">
-<meta name="keywords" content="zmq">
+  <meta name="description" content="比较浅显的理解，主要是对RSA算法有一些数学上的认识。">
+<meta name="keywords" content="tls">
 <meta property="og:type" content="article">
-<meta property="og:title" content="zmq中文指南_0">
-<meta property="og:url" content="http://suntus.github.io/2014/10/13/zmq中文指南-0/index.html">
+<meta property="og:title" content="RSA算法">
+<meta property="og:url" content="http://suntus.github.io/2019/06/17/RSA算法/index.html">
 <meta property="og:site_name" content="Morning~Sun。">
-<meta property="og:description" content="开篇">
+<meta property="og:description" content="比较浅显的理解，主要是对RSA算法有一些数学上的认识。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2016-12-21T06:18:10.000Z">
+<meta property="og:updated_time" content="2019-06-17T11:14:09.063Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zmq中文指南_0">
-<meta name="twitter:description" content="开篇">
+<meta name="twitter:title" content="RSA算法">
+<meta name="twitter:description" content="比较浅显的理解，主要是对RSA算法有一些数学上的认识。">
 
 
 
@@ -116,7 +116,7 @@
 
 
 
-  <link rel="canonical" href="http://suntus.github.io/2014/10/13/zmq中文指南-0/">
+  <link rel="canonical" href="http://suntus.github.io/2019/06/17/RSA算法/">
 
 
 
@@ -126,7 +126,7 @@
   };
 </script>
 
-  <title>zmq中文指南_0 | Morning~Sun。</title>
+  <title>RSA算法 | Morning~Sun。</title>
   
 
 
@@ -320,7 +320,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://suntus.github.io/2014/10/13/zmq中文指南-0/">
+    <link itemprop="mainEntityOfPage" href="http://suntus.github.io/2019/06/17/RSA算法/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="suntus">
@@ -337,7 +337,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">zmq中文指南_0
+          <h1 class="post-title" itemprop="name headline">RSA算法
 
               
             
@@ -363,7 +363,7 @@
                 
               
 
-              <time title="创建时间：2014-10-13 22:22 22:22:54" itemprop="dateCreated datePublished" datetime="2014-10-13T22:22:54+08:00">2014-10-13 22:22</time>
+              <time title="创建时间：2019-06-17 18:49 18:49:51" itemprop="dateCreated datePublished" datetime="2019-06-17T18:49:51+08:00">2019-06-17 18:49</time>
             
 
             
@@ -380,7 +380,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2016-12-21 14:18 14:18:10" itemprop="dateModified" datetime="2016-12-21T14:18:10+08:00">2016-12-21 14:18</time>
+                <time title="修改时间：2019-06-17 19:14 19:14:09" itemprop="dateModified" datetime="2019-06-17T19:14:09+08:00">2019-06-17 19:14</time>
               
             
           </span>
@@ -414,11 +414,41 @@
       
 
       
-        <p>开篇<br><a id="more"></a><br>　　首先，开题，这个之前就有人写过了，<a href="https://github.com/anjuke/zguide-cn" target="_blank" rel="noopener">在这里</a>，但是那个是2.1.0 stable release，之后zmq改进的还挺多的，还有就是想锻炼下自己的英语，就开始吧。</p>
-<p>说明：</p>
+        <p>比较浅显的理解，主要是对RSA算法有一些数学上的认识。<br><a id="more"></a></p>
+<h3 id="1-数学原理"><a href="#1-数学原理" class="headerlink" title="1. 数学原理"></a>1. 数学原理</h3><h4 id="1-1-质数很容易生成"><a href="#1-1-质数很容易生成" class="headerlink" title="1.1 质数很容易生成"></a>1.1 质数很容易生成</h4><p>给定一个长度，很容易找到符合这个长度的一个随机质数。这个结论依赖两点：</p>
 <ol>
-<li>文中的图片都截图自<a href="http://zguide.zeromq.org/page:all" target="_blank" rel="noopener">英文指南</a>。</li>
-<li>水平有限呐 -,-　，但是我会尽力的</li>
+<li>质数在任意长度内都广泛存在；</li>
+<li>即使数很大(比如4096位)，也很容易判断它到底是不是个质数。</li>
+</ol>
+<p>要生成一个质数，先随机生成一批给定长度的数字，然后判断它们是不是质数。根据<code>Prime Number Theorem</code>，找到一个质数，需要判断的候选数字个数在$\ln(x)$的阶上($O(\ln(x))$???), $x$是给定的长度。</p>
+<p>之前判断一个数是不是质数需要找它所有的因子，看是不是只有1和它本身，如果是那就是质数。现在的方法是判断一个数是不是有质数的一些性质。如果不能很快判断一个数是不是质数，现代的很多公钥算法就很难实际应用了。</p>
+<h4 id="1-2-乘法很容易计算"><a href="#1-2-乘法很容易计算" class="headerlink" title="1.2 乘法很容易计算"></a>1.2 乘法很容易计算</h4><p>有两个很大(512位以上)的质数$p, q$, 很容易算出他们的乘积$n = pq$。</p>
+<h4 id="1-3-因式分解很难"><a href="#1-3-因式分解很难" class="headerlink" title="1.3 因式分解很难"></a>1.3 因式分解很难</h4><p>尽管经过几百年的研究，现在因式分解的方法比一个个查找的方法快很多(现在最快的能接近$\sqrt{n}$)，但还是很慢，非常慢。</p>
+<h4 id="1-4-幂的模很容易计算"><a href="#1-4-幂的模很容易计算" class="headerlink" title="1.4 幂的模很容易计算"></a>1.4 幂的模很容易计算</h4><p>给定$n, m, e$, 很容易算出来$c = m^e \text{ mod } n$</p>
+<h4 id="1-5-如果给出因子，很容易计算出模的根"><a href="#1-5-如果给出因子，很容易计算出模的根" class="headerlink" title="1.5 如果给出因子，很容易计算出模的根"></a>1.5 如果给出因子，很容易计算出模的根</h4><p>给定$n, e, c$，还有$n$的质数因子$p, q$, 很容易计算出$c = m^e \text{ mod } n$中的$m$<br>方法就是存在$d$满足$m = (m ^ e) ^ d \text{ mod } n = c^d \text{ mod } n$</p>
+<p>其中d按如下方法计算：<br>$L = LCM(p-1, q-1)$，LCM是$p-1,q-1$的最小公倍数，$d$是所有满足 $d \cdot e \text{ mod } L = 1$的数，也就是说，$d$和$e$是关于$\text{ mod } L$的倒数，$e$跟$p-1$和$q-1$互质保证了$d$一定存在。模倒数可以用扩展欧几里得算法很容易算出来。</p>
+<h4 id="1-6-如果不给出因子，计算模的根很难"><a href="#1-6-如果不给出因子，计算模的根很难" class="headerlink" title="1.6 如果不给出因子，计算模的根很难"></a>1.6 如果不给出因子，计算模的根很难</h4><p>如果只给出$n, e, c$，不给出n的因子$p, q$，就很难计算出$c = m^e \text{ mod } n$中的$m$。</p>
+<p>要恢复$m$，需要先找到$d$，事实上，任何确定d的方法都会转到因式分解$n$的路上。</p>
+<h3 id="2-RSA加解密"><a href="#2-RSA加解密" class="headerlink" title="2. RSA加解密"></a>2. RSA加解密</h3><p>有了以上的基础，现在可以描述一下RSA密钥对儿的生成步骤了。</p>
+<p>加密系统中的公钥包含$n$和$e$，$n$叫<em>模数(modulus)</em>，$e$叫<em>公钥指数(public exponent)</em>。私钥包含$n$和$d$，$d$叫<em>私钥指数(private exponent)</em>。</p>
+<p>生成步骤如下：</p>
+<ol>
+<li>生成一对儿很大的随机质数$p,q$</li>
+<li>计算模数$n = pq$</li>
+<li>在[3,n-1]之间挑选一个奇数$e$, 作为公钥指数，并保证$e$和 $p-1、q-1$互质。</li>
+<li>用$e, p, q$计算私钥指数$d$。 先算$L = LCM(p-1, q-1)$, LCM是$p-1$和$q-1$的最小公倍数，$d$满足$d \cdot e \text{ mod } L = 1$， 可以用扩展欧几里得算法算出来。</li>
+<li>$(n, e)$就是公钥， $(n, d)$就是私钥。</li>
+</ol>
+<p>加密操作：</p>
+<script type="math/tex; mode=display">c = m^e \text{ mod } n</script><p>解密操作:</p>
+<script type="math/tex; mode=display">m = c^d \text{ mod } n</script><p>签名操作：</p>
+<script type="math/tex; mode=display">s = m^d \text{ mod } n</script><p>验签操作：</p>
+<script type="math/tex; mode=display">m = s^e \text{ mod } n</script><p>我们常数的RSA 4096指的是$n$的位数，表示RSA算法一次可以加密多少位的数据。</p>
+<h3 id="3-openssl相关的几个问题"><a href="#3-openssl相关的几个问题" class="headerlink" title="3. openssl相关的几个问题"></a>3. openssl相关的几个问题</h3><ol>
+<li><code>RSA_size()</code>和<code>RSA_bits()</code>的返回值<br><code>RSA_size()</code>返回的是rsa-&gt;n的字节数，这个值乘8就是期望的1024, 2048, 4096等值。<br><code>RSA_bits()</code>返回的是rsa-&gt;n的有效位数，这个值不一定就是1024这些值，因为最高有效位可能是0。(其实openssl内置的rsa密钥生成函数中，保证了n的最高4个有效位必须在[0x9, 0xf]之间)。</li>
+</ol>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ol>
+<li>讲RSA非常好的一个，基本是这篇的摘要: The Mathematics of the RSA Public-Key Cryptosystem</li>
 </ol>
 
       
@@ -449,7 +479,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="/2014/10/13/zmq中文指南-0/" title="zmq中文指南_0">2014/10/13/zmq中文指南-0/</a>
+    <a href="/2019/06/17/RSA算法/" title="RSA算法">2019/06/17/RSA算法/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权： </strong>
@@ -461,7 +491,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/zmq/" rel="tag"># zmq</a>
+            <a href="/tags/tls/" rel="tag"># tls</a>
           
         </div>
       
@@ -474,8 +504,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2014/10/07/晚上都是好时光/" rel="next" title="晚上都是好时光">
-                <i class="fa fa-chevron-left"></i> 晚上都是好时光
+              <a href="/2019/05/31/ECC算法/" rel="next" title="ECC算法">
+                <i class="fa fa-chevron-left"></i> ECC算法
               </a>
             
           </div>
@@ -483,10 +513,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2014/10/13/zmq中文指南-1/" rel="prev" title="zmq中文指南_1">
-                zmq中文指南_1 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -538,8 +564,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
             
@@ -641,6 +676,23 @@
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-数学原理"><span class="nav-text">1. 数学原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-质数很容易生成"><span class="nav-text">1.1 质数很容易生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-乘法很容易计算"><span class="nav-text">1.2 乘法很容易计算</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-因式分解很难"><span class="nav-text">1.3 因式分解很难</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-幂的模很容易计算"><span class="nav-text">1.4 幂的模很容易计算</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5-如果给出因子，很容易计算出模的根"><span class="nav-text">1.5 如果给出因子，很容易计算出模的根</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-6-如果不给出因子，计算模的根很难"><span class="nav-text">1.6 如果不给出因子，计算模的根很难</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-RSA加解密"><span class="nav-text">2. RSA加解密</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-openssl相关的几个问题"><span class="nav-text">3. openssl相关的几个问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
@@ -780,9 +832,9 @@
 
 <script>
   var disqus_config = function() {
-    this.page.url = "http://suntus.github.io/2014/10/13/zmq中文指南-0/";
-    this.page.identifier = "2014/10/13/zmq中文指南-0/";
-    this.page.title = 'zmq中文指南_0';
+    this.page.url = "http://suntus.github.io/2019/06/17/RSA算法/";
+    this.page.identifier = "2019/06/17/RSA算法/";
+    this.page.title = 'RSA算法';
     };
   function loadComments() {
     var d = document, s = d.createElement('script');
@@ -822,6 +874,43 @@
   
   
 
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+      for (i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+<script src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<style>
+.MathJax_Display {
+  overflow: auto hidden;
+}
+</style>
+
+    
   
 
 
