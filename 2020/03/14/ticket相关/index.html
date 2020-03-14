@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":"flase","async":true,"transition":{"post_block":"fadeIn","post_header":"fadeIn","post_body":"fadeIn","coll_header":"fadeIn","sidebar":"fadeIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1. 为什么ticket给TLS提供一个不需要在server存储会话状态(session)的机制来恢复会话。适用于TLS1.0, 1.1, 1.2。在以下情况下很有用:  server需要处理大量不同用户的session; server希望长时间存储session; 需要使用跨server的负载均衡; 在内存很少的嵌入式的server上。">
+<meta name="keywords" content="tls">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ticket相关">
+<meta property="og:url" content="http://suntus.github.io/2020/03/14/ticket相关/index.html">
+<meta property="og:site_name" content="Morning~Sun。">
+<meta property="og:description" content="1. 为什么ticket给TLS提供一个不需要在server存储会话状态(session)的机制来恢复会话。适用于TLS1.0, 1.1, 1.2。在以下情况下很有用:  server需要处理大量不同用户的session; server希望长时间存储session; 需要使用跨server的负载均衡; 在内存很少的嵌入式的server上。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://suntus.github.io/img/ticket相关/ticket.png">
+<meta property="og:updated_time" content="2020-03-14T14:14:14.153Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ticket相关">
+<meta name="twitter:description" content="1. 为什么ticket给TLS提供一个不需要在server存储会话状态(session)的机制来恢复会话。适用于TLS1.0, 1.1, 1.2。在以下情况下很有用:  server需要处理大量不同用户的session; server希望长时间存储session; 需要使用跨server的负载均衡; 在内存很少的嵌入式的server上。">
+<meta name="twitter:image" content="http://suntus.github.io/img/ticket相关/ticket.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Morning~Sun。" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://suntus.github.io/2020/03/14/ticket相关/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ticket相关 | Morning~Sun。</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-55322469-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-55322469-1');
+  </script>
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Morning~Sun。</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">ha</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://suntus.github.io/2020/03/14/ticket相关/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="suntus">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Morning~Sun。">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ticket相关
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-03-14 22:08 22:08:23" itemprop="dateCreated datePublished" datetime="2020-03-14T22:08:23+08:00">2020-03-14 22:08</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-03-14 22:14 22:14:14" itemprop="dateModified" datetime="2020-03-14T22:14:14+08:00">2020-03-14 22:14</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-为什么"><a href="#1-为什么" class="headerlink" title="1. 为什么"></a>1. 为什么</h1><p>ticket给TLS提供一个不需要在server存储会话状态(session)的机制来恢复会话。适用于TLS1.0, 1.1, 1.2。在以下情况下很有用:</p>
+<ol>
+<li>server需要处理大量不同用户的session;</li>
+<li>server希望长时间存储session;</li>
+<li>需要使用跨server的负载均衡;</li>
+<li>在内存很少的嵌入式的server上。<a id="more"></a>
+</li>
+</ol>
+<p>之前使用session ID的方法需要server将各种加密参数保存在本地，client下次希望恢复session的时候，就将session ID一并带上，server根据session ID查找本地缓存，找到对应的参数，然后直接建立握手。对照上面几个情况，看session ID为什么不适用：</p>
+<ol>
+<li>server处理大量会话需要在本地保存很多加密参数，内存占用和查找效率都会受影响；</li>
+<li>长时间存储session导致长时间占用内存；</li>
+<li>session通常保存在一个server上，如果跨server负载均衡，需要将session统一存储，或支持跨server查询；</li>
+<li>内存占用。</li>
+</ol>
+<h1 id="2-是什么"><a href="#2-是什么" class="headerlink" title="2. 是什么"></a>2. 是什么</h1><h2 id="2-1-主要流程"><a href="#2-1-主要流程" class="headerlink" title="2.1. 主要流程"></a>2.1. 主要流程</h2><ol>
+<li>第一次完整握手，client在ClientHello中发送一个空的session_ticket扩展，表示client支持ticket会话恢复机制，</li>
+<li>server回复一个空的session_ticket扩展，表示自己将会发送一个新的ticket。server会在发送CCS之前发送一个NewSessionTicket的消息，里边存放着用于会话恢复的各种参数，并加密。</li>
+<li>client收到后将ticket和本地的session一并存储。</li>
+<li>第二次会话恢复，client在ClientHello中发送不为空的session_ticket扩展，表示client希望进行会话恢复；</li>
+<li>server收到后，解密校验，如果校验正确，就使用该session参数进行会话恢复。</li>
+<li>不管server接受不接受client发送的ticket，只要server觉得需要签发一个新的ticket，都要发送session_ticket扩展，也就是说，ServerHello中的session_ticket就是指示server是否发送NewSessionTicket的。</li>
+</ol>
+<p>server签发ticket的过程如下：<img src="/img/ticket相关/ticket.png" alt="ticket签发"></p>
+<h2 id="2-2-ticket的生命周期"><a href="#2-2-ticket的生命周期" class="headerlink" title="2.2. ticket的生命周期"></a>2.2. ticket的生命周期</h2><p>开始：</p>
+<ol>
+<li>client从server接收新签发的ticket，保存到本地。</li>
+</ol>
+<p>结束：</p>
+<ol>
+<li>ticket在client的缓存中超时；</li>
+<li>ticket由client的本地策略提前结束使用；</li>
+<li>server新签发了ticket，需要更新本地的ticket；</li>
+<li>会话恢复时出错的时，需要删除ticket。</li>
+</ol>
+<h2 id="2-3-ticket的相关结构"><a href="#2-3-ticket的相关结构" class="headerlink" title="2.3. ticket的相关结构"></a>2.3. ticket的相关结构</h2><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">struct &#123;</span><br><span class="line">    HandshakeType msg_type;</span><br><span class="line">    uint24 length;</span><br><span class="line">    select (HandshakeType) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">hello_request:</span> HelloRequest;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">client_hello:</span> ClientHello;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">server_hello:</span> ServerHello;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">certificate:</span> Certificate;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">server_key_exchange:</span> ServerKeyExchange;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">certificate_request:</span> CertificateRequest;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">server_hello_done:</span> ServerHelloDone;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">certificate_verify:</span> CertificateVerify;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">client_key_exchange:</span> ClientKeyExchange;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">finished:</span> Finished;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">session_ticket:</span> NewSessionTicket; <span class="comment">/* NEW */</span></span><br><span class="line">    &#125; body;</span><br><span class="line">&#125; Handshake;</span><br><span class="line"></span><br><span class="line">struct &#123;</span><br><span class="line">    uint32 ticket_lifetime_hint;</span><br><span class="line">    opaque ticket&lt;<span class="number">0.</span><span class="number">.2</span>^<span class="number">16</span><span class="number">-1</span>&gt;;</span><br><span class="line">&#125; NewSessionTicket;</span><br><span class="line"></span><br><span class="line">struct &#123;</span><br><span class="line">    opaque key_name[<span class="number">16</span>];</span><br><span class="line">    opaque iv[<span class="number">16</span>];</span><br><span class="line">    opaque encrypted_state&lt;<span class="number">0.</span><span class="number">.2</span>^<span class="number">16</span><span class="number">-1</span>&gt;;</span><br><span class="line">    opaque mac[<span class="number">32</span>];</span><br><span class="line">&#125; ticket;</span><br></pre></td></tr></table></figure>
+<p>其中:</p>
+<ul>
+<li><code>ticket_lifetime_hint</code>: server签发的该ticket的存活时间，从client收到NewSessionTicket开始计算，client以此判断该ticket的超时时间，单位是秒。</li>
+<li><code>ticket</code>: server签发的ticket的具体内容，包含加密的一些参数。</li>
+<li><code>key_name</code>: 表示该ticket用的是哪组秘钥加密认证的，通过该参数，server能很容易判断该ticket是不是自己签发的。通常是在server启动时随机生成的。</li>
+<li><code>iv</code>: server使用AES128-CBC模式去加密<code>encrypted_state</code>，用到的IV保存在这里，IV每次签发ticket的时候都随机生成，每个ticket都不一样。- <code>encrypted_state</code>：使用AES128-CBC和<code>iv</code>加密的实际session参数。</li>
+<li><code>mac</code>: server使用HMAC-SHA256生成消息认证码MAC，认证的消息为: <code>key_name + iv + encrypted_state_len + encrypted_state</code>。</li>
+<li>server加密需要两个秘钥——AES128-CBC使用的加密秘钥，HMAC-SHA256使用的认证秘钥。</li>
+</ul>
+<p>其中<code>encrypted_state</code>中没有规定，建议是：<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    ProtocolVersion protocol_version;</span><br><span class="line">    CipherSuite cipher_suite;</span><br><span class="line">    CompressionMethod compression_method;</span><br><span class="line">    opaque master_secret[<span class="number">48</span>];</span><br><span class="line">    ClientIdentity client_identity;</span><br><span class="line">    uint32 timestamp;</span><br><span class="line">&#125; StatePlaintext;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">enum</span> &#123;</span></span><br><span class="line">    anonymous(<span class="number">0</span>),</span><br><span class="line">    certificate_based(<span class="number">1</span>),</span><br><span class="line">    psk(<span class="number">2</span>)</span><br><span class="line">&#125; ClientAuthenticationType;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    ClientAuthenticationType client_authentication_type;</span><br><span class="line">    <span class="keyword">select</span> (ClientAuthenticationType) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="symbol">anonymous:</span> <span class="class"><span class="keyword">struct</span> &#123;&#125;;</span></span><br><span class="line">        <span class="keyword">case</span> <span class="symbol">certificate_based:</span></span><br><span class="line">            ASN.<span class="number">1</span>Cert certificate_list&lt;<span class="number">0</span>..<span class="number">2</span>^<span class="number">24</span>-<span class="number">1</span>&gt;;</span><br><span class="line">        <span class="keyword">case</span> <span class="symbol">psk:</span></span><br><span class="line">            opaque psk_identity&lt;<span class="number">0</span>..<span class="number">2</span>^<span class="number">16</span>-<span class="number">1</span>&gt;; <span class="regexp">/* from [RFC4279] */</span></span><br><span class="line">    &#125;;</span><br><span class="line">&#125; ClientIdentity;</span><br></pre></td></tr></table></figure></p>
+<p>其中:</p>
+<ul>
+<li><code>protocol_version</code>: 签发该ticket时候使用的协议版本。</li>
+<li><code>cipher_suite</code>: 签发该ticket时候使用的加密套件。</li>
+<li><code>master_secret</code>: 签发该ticket时候使用的主秘钥。</li>
+<li><code>timestamp</code>: server用来判断ticket是否超时的。</li>
+<li><code>client_identity</code>: 如果进行了client认证，这里会包含一些对client认证的消息。</li>
+<li><code>certificate_based</code>: client认证使用了证书，这里就包含client的证书列表</li>
+<li><code>psk_identity</code>: client使用了PSK认证，这里就包含了psk的id，用该id可以查找到psk的相关信息。</li>
+</ul>
+<h2 id="2-4-ticket跟原有的session-ID机制的交互使用"><a href="#2-4-ticket跟原有的session-ID机制的交互使用" class="headerlink" title="2.4. ticket跟原有的session ID机制的交互使用"></a>2.4. ticket跟原有的session ID机制的交互使用</h2><ol>
+<li>第一次握手，如果server表示会签发新的ticket，session ID就为空；</li>
+<li>第二次握手，server拒绝使用ticket，可以发送非空的session ID表示自己支持有状态的会话恢复；</li>
+<li>client收到NewSessionTicket的话，就丢掉任何从ServerHello中获取的session ID；</li>
+<li>client发送ticket的时候，也可以生成一个session ID放在CH中； server如果接受ticket，也可以在SH中返回同样的session ID，这样，client就能区分server什么时候在进行会话恢复，什么时候回退到完整握手——server接受了ticket，就使用ticket进行会话恢复，此时session ID跟client发送的一样，server不接受ticket，如果返回跟client一样的session ID，就表示自己支持有状态的会话恢复，如果返回空，就表示自己不支持会话恢复，会回退到完整握手。同时，因为这个session ID是client自己生成的，所以server不接受ticket的话，也查不到session，只能回复空的session ID，client就能根据session ID是否为空，来判断是否进行会话恢复。</li>
+<li>client发送ticket的时候，server禁止使用session ID进行有状态的恢复；</li>
+<li>总结起来就是：有限使用ticket机制。如果client自己生成了session ID，同时又发送了ticket，server也表示要用该ticket恢复，就返回同样的session ID。</li>
+</ol>
+<h1 id="3-安全性"><a href="#3-安全性" class="headerlink" title="3. 安全性"></a>3. 安全性</h1><ol>
+<li>恢复失败的session会同时将ticket失效。</li>
+<li>被盗的ticket也无所谓，因为ticket是加密的</li>
+<li>伪造的ticket会导致握手失败</li>
+<li>DoS攻击的话，使用<code>key_name</code>可以抵御一部分，另外对ticket的解密校验尽量轻量化，比如使用对称加密算法。</li>
+<li>加密ticket的key的管理建议：<ol>
+<li>key需要随机生成；</li>
+<li>key最少128位；</li>
+<li>key除了加密和校验ticket，不能用作他用；</li>
+<li>key应该周期性更新；</li>
+<li>ticket格式或加密算法更新的话，key需要同时更新。</li>
+</ol>
+</li>
+<li>ticket的有效时间可能超过24小时；</li>
+</ol>
+<h1 id="4-TLS1-3的ticket机制"><a href="#4-TLS1-3的ticket机制" class="headerlink" title="4. TLS1.3的ticket机制"></a>4. TLS1.3的ticket机制</h1><p>TLS1.3将有状态和无状态的会话恢复机制都整合到PSK机制中，当然，PSK也跟最开始诞生的功能有些不一样了，所以TLS1.3的PSK集中了原有的PSK功能、有状态的会话恢复功能(session ID)、无状态的会话恢复功能(ticket)。现在只简单说下PSK的会话恢复功能，TLS1.3的PSK的完整介绍后续再说。</p>
+<p>TLS1.3的会话恢复完全抛弃了CH和SH中session_id字段的功能，但为了兼容考虑，还会在会话恢复的时候进行相应的设置——TLS1.3的client跟TLS1.2的server协商的时候。</p>
+<h2 id="4-1-主要流程"><a href="#4-1-主要流程" class="headerlink" title="4.1. 主要流程"></a>4.1. 主要流程</h2><ol>
+<li>第一次握手，server如果支持会话恢复，就在握手完成后，发送<code>NewSessionTicket</code>消息；</li>
+<li>client如果收到<code>NewSessionTicket</code>消息，就将当前session和其中的ticket存储到一起；</li>
+<li>第二次握手，client在CH中发送<code>pre_shared_key</code>扩展项，其中携带ticket。</li>
+<li>server收到psk扩展后，先解密校验ticket，然后用ticket中的PSK相关key去校验psk。</li>
+<li>server在握手完成后，还可能再签发一个新的<code>NewSessionTicket</code>用于替换之前的。</li>
+</ol>
+<h2 id="4-2-消息格式"><a href="#4-2-消息格式" class="headerlink" title="4.2. 消息格式"></a>4.2. 消息格式</h2><h3 id="4-2-1-server新签发的ticket的NewSessionTicket的消息格式为："><a href="#4-2-1-server新签发的ticket的NewSessionTicket的消息格式为：" class="headerlink" title="4.2.1. server新签发的ticket的NewSessionTicket的消息格式为："></a>4.2.1. server新签发的ticket的<code>NewSessionTicket</code>的消息格式为：</h3><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">struct &#123;</span><br><span class="line">    uint32 ticket_lifetime;</span><br><span class="line">    uint32 ticket_age_add;</span><br><span class="line">    opaque ticket_nonce&lt;<span class="number">0.</span><span class="number">.255</span>&gt;;</span><br><span class="line">    opaque ticket&lt;<span class="number">1.</span><span class="number">.2</span>^<span class="number">16</span><span class="number">-1</span>&gt;;</span><br><span class="line">    Extension extensions&lt;<span class="number">0.</span><span class="number">.2</span>^<span class="number">16</span><span class="number">-2</span>&gt;;</span><br><span class="line">&#125; NewSessionTicket;</span><br></pre></td></tr></table></figure>
+<p>其中:</p>
+<ul>
+<li><code>ticket_lifetime</code>: ticket从签发开始的有效时间，单位是秒。server不能签发超过7天(604800s)的ticket。为0表示该ticket应该立即丢掉。由于往返时间，server可以认为稍微超过一段有效时间的过期ticket仍然有效；</li>
+<li><code>ticket_age_add</code>: 每次签发ticket都生成的一个随机数。用于隐藏CH中<code>pre_shared_key</code>扩展项中的ticket的有效时间，防止攻击者关联起多个连接。psk中的有效时间 = (client自己保存的ticket有效时间(单位毫秒)  + ticket_age_add ) module 2^32。</li>
+<li><code>ticket_nonce</code>: 该连接上签发的ticket的唯一标识，从0开始依次递增；</li>
+<li><code>ticket</code>：用做CH中psk的identity，可以是一个索引(类似session ID一样的，这时候就是有状态的会话恢复)或者加密签名后的数据(类似原始的ticket，这时候就是无状态的会话恢复)。无状态的数据结构类似TLS1.2的ticket。</li>
+<li><code>extensions</code>：TLS1.3现在只定义了一个扩展项——<code>early_data</code>，用于表示server最大能接受的早期数据大小(未加密的明文数据，不包括填充等，纯用户数据长度)。</li>
+</ul>
+<h3 id="4-2-2-PSK扩展项"><a href="#4-2-2-PSK扩展项" class="headerlink" title="4.2.2. PSK扩展项"></a>4.2.2. PSK扩展项</h3><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">struct &#123;</span><br><span class="line">    opaque identity&lt;<span class="number">1</span>..<span class="number">2</span>^<span class="number">16</span>-1&gt;<span class="comment">;</span></span><br><span class="line">    uint32 obfuscated_ticket_age<span class="comment">;</span></span><br><span class="line">&#125; PskIdentity<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">opaque PskBinderEntry&lt;<span class="number">32</span>..<span class="number">255</span>&gt;<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">struct &#123;</span><br><span class="line">    PskIdentity identities&lt;<span class="number">7</span>..<span class="number">2</span>^<span class="number">16</span>-1&gt;<span class="comment">;</span></span><br><span class="line">    PskBinderEntry <span class="keyword">binders&lt;33..2^16-1&gt;;</span></span><br><span class="line"><span class="keyword">&#125; </span>OfferedPsks<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">struct &#123;</span><br><span class="line">    select (Handshake.msg_type) &#123;</span><br><span class="line">        case client_hello: OfferedPsks<span class="comment">;</span></span><br><span class="line">        case server_hello: uint16 selected_identity<span class="comment">;</span></span><br><span class="line">    &#125;<span class="comment">;</span></span><br><span class="line">&#125; PreSharedKeyExtension<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>其中:</p>
+<ul>
+<li><code>identity</code>: 就是<code>NewSessionTicket.ticket</code>。</li>
+<li><code>obfuscated_ticket_age</code>：隐藏的ticket有效时间，外部导入的PSK该值是0，上次会话建立的PSK的有效时间 = (client自己保存的ticket有效时间(单位毫秒) + ticket_age_add ) module 2^32。注意该值是以ms为单位。</li>
+<li><code>identities</code>： cilent希望用的一个identity列表，要是有0-RTT数据，必须用第一个identity(序号是0);</li>
+<li><code>binders</code>: 一列HMAC的值，按照<code>identities</code>的顺序依次排列。目的是将psk(ticket或者sesssion ID或者外部导入的PSK)跟当前握手绑定。</li>
+<li><code>selected_identity</code>: server如果使用psk会话恢复，返回选择的identity的序号(从0开始)。</li>
+</ul>
+<h2 id="4-3-TLS1-3中ticket的安全性考虑"><a href="#4-3-TLS1-3中ticket的安全性考虑" class="headerlink" title="4.3. TLS1.3中ticket的安全性考虑"></a>4.3. TLS1.3中ticket的安全性考虑</h2><p>具体跟0-RTT的早期数据相关，后续再补。</p>
+<h1 id="5-openssl中关于ticket的相关接口"><a href="#5-openssl中关于ticket的相关接口" class="headerlink" title="5. openssl中关于ticket的相关接口"></a>5. openssl中关于ticket的相关接口</h1><h2 id="5-1-处理ticket中的加密数据"><a href="#5-1-处理ticket中的加密数据" class="headerlink" title="5.1. 处理ticket中的加密数据"></a>5.1. 处理ticket中的加密数据</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;openssl/tls1.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">SSL_CTX_set_tlsext_ticket_key_evp_cb</span><span class="params">(SSL_CTX sslctx,</span></span></span><br><span class="line"><span class="function"><span class="params">     <span class="keyword">int</span> (*cb)(SSL *s, <span class="keyword">unsigned</span> <span class="keyword">char</span> key_name[<span class="number">16</span>],</span></span></span><br><span class="line"><span class="function"><span class="params">               <span class="keyword">unsigned</span> <span class="keyword">char</span> iv[EVP_MAX_IV_LENGTH],</span></span></span><br><span class="line"><span class="function"><span class="params">               EVP_CIPHER_CTX *ctx, EVP_MAC_CTX *hctx, <span class="keyword">int</span> enc))</span></span>;</span><br><span class="line"><span class="comment">// OpenSSL 3.0引入</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">SSL_CTX_set_tlsext_ticket_key_cb</span><span class="params">(SSL_CTX sslctx,</span></span></span><br><span class="line"><span class="function"><span class="params">     <span class="keyword">int</span> (*cb)(SSL *s, <span class="keyword">unsigned</span> <span class="keyword">char</span> key_name[<span class="number">16</span>],</span></span></span><br><span class="line"><span class="function"><span class="params">               <span class="keyword">unsigned</span> <span class="keyword">char</span> iv[EVP_MAX_IV_LENGTH],</span></span></span><br><span class="line"><span class="function"><span class="params">               EVP_CIPHER_CTX *ctx, HMAC_CTX *hctx, <span class="keyword">int</span> enc))</span></span>;</span><br><span class="line"><span class="comment">// OpenSSL 3.0中被废除</span></span><br></pre></td></tr></table></figure>
+<p>因为没有必要为每一个session都维护一个单独的加密状态，所以就交给用户去维护，然后用户负责ticket中部分参数的生成和和状态维护。</p>
+<p>server收到client发来的空的<code>session_ticket</code>扩展项，<code>enc</code>参数为1，表示这是要签发一个新的ticket，应用需要设置<code>key_name, iv, ctx, hctx</code> 给lib，lib会使用这些信息去创建并加密ticket。<br>server收到client发来的非空的<code>session_ticket</code>扩展项，<code>enc</code>参数为0， 表示这是要解析一个ticket，lib会传给应用<code>key_name, iv</code>，应用需要设置<code>ctx, hctx</code>给lib，用以解密校验ticket。<br>返回值表示应用是否希望签发使用新的ticket:</p>
+<ul>
+<li>2: 表示应用已经设置了<code>ctx, hctx</code>，可以继续处理当前收到的ticket，另外需要重新签发一个ticket，该cb会在签发新ticket的时候再被调用一次，这次<code>enc</code>会被设为1.</li>
+<li>1: <code>ctx, hctx</code>已经设置了，可以继续按默认情况处理。</li>
+<li>0: 表示应用无法处理该ticket，需要进行完整握手或者使用session ID会话恢复机制。</li>
+<li>小于0: 出错了。</li>
+</ul>
+<h2 id="5-2-设置签发和校验ticket时候的用户接口和数据"><a href="#5-2-设置签发和校验ticket时候的用户接口和数据" class="headerlink" title="5.2. 设置签发和校验ticket时候的用户接口和数据"></a>5.2. 设置签发和校验ticket时候的用户接口和数据</h2><figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">typedef int (<span class="name">*SSL_CTX_generate_session_ticket_fn</span>)(<span class="name">SSL</span> *s, void *arg)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">typedef SSL_TICKET_RETURN (<span class="name">*SSL_CTX_decrypt_session_ticket_fn</span>)(<span class="name">SSL</span> *s, SSL_SESSION *ss, const unsigned char *keyname, size_t keyname_len, SSL_TICKET_STATUS status, void *arg)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">int SSL_CTX_set_session_ticket_cb(<span class="name">SSL_CTX</span> *ctx, SSL_CTX_generate_session_ticket_fn gen_cb, SSL_CTX_decrypt_session_ticket_fn dec_cb, void *arg)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p><code>gen_cb()</code>是给应用提供的在生成ticket的时候进行的回调，在回调中应用可以调用<code>SSL_SESSION_set1_ticket_appdata()</code>在ticket中设置用户数据。<code>gen_cb()</code>中的参数<code>arg</code>就是<code>SSL_CTX_set_session_ticket_cb()</code>中的<code>arg</code>。<br>默认情况下，会话恢复的时候，TLS1.2不会再签发新的ticket，TLS1.3每次会话恢复都会签发新的ticket，可以用<code>SSL_CTX_set_tlsext_ticket_key_cb()</code>改变这个行为。</p>
+<p><code>dec_cb()</code>是在库尝试解密ticket之后，给应用提供的回调。如果解密成功，<code>ss</code>中存放的是session，<code>keyname</code>和<code>keyname_len</code>是解密ticket使用的秘钥标识，<code>status</code>是解密是否成功，<code>arg</code>就是<code>SSL_CTX_set_session_ticket_cb()</code>中的<code>arg</code>。该回调被调用的时候，<code>sessionss</code>还没绑定到SSL<code>s</code>上。做任何操作前， 都要先检查<code>status</code>：</p>
+<ul>
+<li><code>SSL_TICKET_EMPTY</code>: 空的ticket数据，就是CH中发送了空的<code>session_ticket</code>扩展，表示client支持ticket机制。只在TLS1.2之前使用，TLS1.3没意义。</li>
+<li><code>SSL_TICKET_NO_DECRYPT</code>: 无法解密ticket，没有ticket数据可用，且应该给client<br>发送新的ticket。</li>
+<li><code>SSL_TICKET_SUCCESS</code>: ticket解密成功，可以使用应用数据，不应该发送新的ticket。</li>
+<li><code>SSL_TICKET_SUCCESS_RENEW</code>: 跟<code>SSL_TICKET_SUCCESS</code>一样，但要发送新的ticket。</li>
+</ul>
+<p><code>dec_cb()</code>的返回值可以是：</p>
+<ul>
+<li><code>SSL_TICKET_RETURN_ABORT</code>: 应用判断需要中止握手，可能是由于检测ticket相关数据失败了。注意，TLS1.3一次握手可能会签发多个ticket，一个ticket失效不代表其他也失效，需要小心使用该返回值。</li>
+<li><code>SSL_TICKET_RETURN_IGNORE</code>: 不使用该ticket，也不要签发新的ticket。</li>
+<li><code>SSL_TICKET_RETURN_IGNORE_RENEW</code>:不使用该ticket，但签发一个新的ticket。</li>
+<li><code>SSL_TICKET_RETURN_USE</code>: 使用ticket，但不签发新的ticket。</li>
+<li><code>SSL_TICKET_RETURN_USE_RENEW</code>: 使用ticket，签发新的ticket。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">SSL_SESSION_set1_ticket_appdata</span><span class="params">(SSL_SESSION *ss, <span class="keyword">const</span> <span class="keyword">void</span> *data, <span class="keyword">size_t</span> len)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">SSL_SESSION_get0_ticket_appdata</span><span class="params">(SSL_SESSION *ss, <span class="keyword">void</span> **data, <span class="keyword">size_t</span> *len)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><code>SSL_SESSION_set1_ticket_appdata(()</code>可以将用户数据存入ticket发送给client。</p>
+<h2 id="5-3-设置TLS1-3中ticket签发个数"><a href="#5-3-设置TLS1-3中ticket签发个数" class="headerlink" title="5.3. 设置TLS1.3中ticket签发个数"></a>5.3. 设置TLS1.3中ticket签发个数</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">SSL_set_num_tickets</span><span class="params">(SSL *s, <span class="keyword">size_t</span> num_tickets)</span></span>;</span><br><span class="line"><span class="keyword">size_t</span> SSL_get_num_tickets(SSL *s);</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">SSL_CTX_set_num_tickets</span><span class="params">(SSL_CTX *ctx, <span class="keyword">size_t</span> num_tickets)</span></span>;</span><br><span class="line"><span class="keyword">size_t</span> SSL_CTX_get_num_tickets(SSL_CTX *ctx);</span><br></pre></td></tr></table></figure>
+<p>设置TLS1.3完整握手后，server可以发送多少个ticket。默认是2个，也可以是0个。会话恢复之后默认发送1个新的ticket，会话恢复后发送的个数不能用这些函数改变，可以用<code>SSL_CTX_set_tlsext_ticket_key_cb</code>改变。<br>TLS1.3中，server使用<code>SSL_verify_client_post_handshake()</code>进行握手后认证，client发来证书后，还会签发新的ticket，这个ticket个数跟开始的握手时签发的个数一样，如果开始的是完整握手，那也可以在调用<code>SSL_verify_client_post_handshake()</code>之前调用<code>SSL_set_num_tickets</code>重新设置签发个数。</p>
+<p><strong>参考</strong>:</p>
+<ol>
+<li><a href="https://www.openssl.org/docs/manmaster/man3/SSL_set_num_tickets.html" target="_blank" rel="noopener">openssl手册</a></li>
+<li><a href="https://tools.ietf.org/html/rfc8446" target="_blank" rel="noopener">RFC8446-TLS1.3 PSK,ticket</a></li>
+<li><a href="https://tools.ietf.org/html/rfc5246" target="_blank" rel="noopener">RFC5246-TLS1.2 session ID</a></li>
+<li><a href="https://tools.ietf.org/html/rfc5077" target="_blank" rel="noopener">RFC5077-Transport Layer Security (TLS) Session Resumption without<br>Server-Side State</a>)</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+    <div>
+ 
+ 
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+      <strong>本文作者：</strong>suntus
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="/2020/03/14/ticket相关/" title="ticket相关">2020/03/14/ticket相关/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权： </strong>
+    本站文章均采用 <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0 CN</a> 许可协议，请勿用于商业，转载注明出处！
+  </li>
+</ul>
+
+</div>
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tls/" rel="tag"># tls</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/30/ALPN相关/" rel="next" title="ALPN相关">
+                <i class="fa fa-chevron-left"></i> ALPN相关
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">suntus</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">82</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">20</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-为什么"><span class="nav-text">1. 为什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-是什么"><span class="nav-text">2. 是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-主要流程"><span class="nav-text">2.1. 主要流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-ticket的生命周期"><span class="nav-text">2.2. ticket的生命周期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-ticket的相关结构"><span class="nav-text">2.3. ticket的相关结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-ticket跟原有的session-ID机制的交互使用"><span class="nav-text">2.4. ticket跟原有的session ID机制的交互使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-安全性"><span class="nav-text">3. 安全性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-TLS1-3的ticket机制"><span class="nav-text">4. TLS1.3的ticket机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-主要流程"><span class="nav-text">4.1. 主要流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-消息格式"><span class="nav-text">4.2. 消息格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-1-server新签发的ticket的NewSessionTicket的消息格式为："><span class="nav-text">4.2.1. server新签发的ticket的NewSessionTicket的消息格式为：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-2-PSK扩展项"><span class="nav-text">4.2.2. PSK扩展项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-TLS1-3中ticket的安全性考虑"><span class="nav-text">4.3. TLS1.3中ticket的安全性考虑</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-openssl中关于ticket的相关接口"><span class="nav-text">5. openssl中关于ticket的相关接口</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-处理ticket中的加密数据"><span class="nav-text">5.1. 处理ticket中的加密数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-设置签发和校验ticket时候的用户接口和数据"><span class="nav-text">5.2. 设置签发和校验ticket时候的用户接口和数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-设置TLS1-3中ticket签发个数"><span class="nav-text">5.3. 设置TLS1.3中ticket签发个数</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">suntus</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
