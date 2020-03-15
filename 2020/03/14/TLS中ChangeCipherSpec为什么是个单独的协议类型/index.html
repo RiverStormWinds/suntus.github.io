@@ -104,7 +104,7 @@
 <meta property="og:site_name" content="Morning~Sun。">
 <meta property="og:description" content="RFC5246中说:  Note: To help avoid pipeline stalls, ChangeCipherSpec is an independent TLS Protocol content type, and is not actually a TLS handshake message.  为了避免pipeline stall，ChangeCipherSpec是个单独的协议类">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-03-14T14:27:40.561Z">
+<meta property="og:updated_time" content="2020-03-15T14:29:13.641Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="TLS中ChangeCipherSpec为什么是个单独的协议类型">
 <meta name="twitter:description" content="RFC5246中说:  Note: To help avoid pipeline stalls, ChangeCipherSpec is an independent TLS Protocol content type, and is not actually a TLS handshake message.  为了避免pipeline stall，ChangeCipherSpec是个单独的协议类">
@@ -363,12 +363,24 @@
                 
               
 
-              <time title="创建时间：2020-03-14 22:27 22:27:25 / 修改时间：22:27:40" itemprop="dateCreated datePublished" datetime="2020-03-14T22:27:25+08:00">2020-03-14 22:27</time>
+              <time title="创建时间：2020-03-14 22:27 22:27:25" itemprop="dateCreated datePublished" datetime="2020-03-14T22:27:25+08:00">2020-03-14 22:27</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-03-15 22:29 22:29:13" itemprop="dateModified" datetime="2020-03-15T22:29:13+08:00">2020-03-15 22:29</time>
               
             
           </span>
@@ -407,12 +419,13 @@
 <p>Note: To help avoid pipeline stalls, ChangeCipherSpec is an independent TLS Protocol content type, and is not actually a TLS handshake message.</p>
 </blockquote>
 <p>为了避免pipeline stall，<code>ChangeCipherSpec</code>是个单独的协议类型，不属于握手协议。这里什么是pipeline stall？</p>
+<a id="more"></a>
 <h1 id="1-pipeline-stall"><a href="#1-pipeline-stall" class="headerlink" title="1. pipeline stall"></a>1. pipeline stall</h1><p>通俗点的理解是，在CPU流水线设计中，有些指令必须在某些指令之后执行，中间需要停顿一下，等待前一个指令执行完，才能开始后一个指令；或者逻辑分支时，需要控制程序指令转移，导致流水线停顿。如果这样的stall过多，就会影响的性能。可以采取一些办法减少或避免停顿。</p>
 <h1 id="2-TLS1-2及之前的ChangeCipherSpec"><a href="#2-TLS1-2及之前的ChangeCipherSpec" class="headerlink" title="2. TLS1.2及之前的ChangeCipherSpec"></a>2. TLS1.2及之前的ChangeCipherSpec</h1><p>为什么<code>ChangeCipherSpec</code>需要是单独的类型呢？如果是握手协议类型，TLS协议规定相同协议类型的数据可以集中到一个record中发送，也就是说，一个record中可以同时存放<code>ClientKeyExchange,ChangeCipherSpec,Finished</code>这三个消息，其中<code>ClientKeyExchange,ChangeCipherSpec</code>这两个是不加密的，<code>Finished</code>是需要加密的。但TLS的加密是以record为单位的，一个record只能加密或不加密，不能其中一部分数据加密，另一部分不加密。所以在实现的时候，必须将<code>Finished</code>放入一个单独的record中，另外，在<code>ChangeCipherSpec</code>和<code>Finished</code>之间，也需要将连接状态从明文状态转换到加密状态，就需要停顿一下。</p>
 <p>但是，并不一定每个实现都能很好的遵循”将<code>Finished</code>放入单独的record中发送”这个约定，这样就在协议设计的时候添加了这样的冗余，相当于使用<code>ChangeCipherSpec</code>将<code>ClientKeyExchange</code>和<code>Finished</code>强制分配到两个record中。</p>
 <h1 id="3-TLS1-3的ChangeCipherSpec"><a href="#3-TLS1-3的ChangeCipherSpec" class="headerlink" title="3. TLS1.3的ChangeCipherSpec"></a>3. TLS1.3的ChangeCipherSpec</h1><p>TLS1.3中并不需要该消息，因为协议本身保证了在状态转换前发送的消息都是确定的，比如握手消息在<code>ClientHello, ServerHello</code>之后都是加密的，应用消息在发送完<code>Finished</code>之后也都是加密的，而且TLS1.3的秘钥推导跟之前版本的也都不一样，不需要CCS这样的冗余设计。但为了兼容性，还是保留了一些。</p>
 <h1 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h1><p><code>ChangeCipherSpec</code>是TLS1.2及之前的协议设计的冗余消息，目的是从协议上避免实现时的流水线停顿问题。</p>
-<p><strong><em>参考</em></strong></p>
+<p><strong>参考</strong></p>
 <ol>
 <li><a href="https://www.technipages.com/definition/pipeline-stall" target="_blank" rel="noopener">pipeling stall</a></li>
 <li><a href="https://security.stackexchange.com/questions/24755/why-is-change-cipher-spec-an-independent-protocol-content-type-and-not-part-of-h" target="_blank" rel="noopener">CCS pipeling stall</a></li>
