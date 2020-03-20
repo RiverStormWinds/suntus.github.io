@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":"flase","async":true,"transition":{"post_block":"fadeIn","post_header":"fadeIn","post_body":"fadeIn","coll_header":"fadeIn","sidebar":"fadeIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1. 为什么TLS通常用证书体系(PKI)进行认证，先回顾一下传统的RSA证书认证过程，  server发送证书给client, 证书中包含RSA的公钥，只有server有证书中公钥对应的私钥; client收到证书后，对证书进行校验(PKI体系一层层往CA验证，直到根CA)，校验通过后，用证书中的公钥对预主密钥(client每次随机生成)进行加密，将加密后的数据发送给server； 只有serv">
+<meta name="keywords" content="tls">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PSK相关">
+<meta property="og:url" content="http://suntus.github.io/2020/03/20/PSK相关/index.html">
+<meta property="og:site_name" content="Morning~Sun。">
+<meta property="og:description" content="1. 为什么TLS通常用证书体系(PKI)进行认证，先回顾一下传统的RSA证书认证过程，  server发送证书给client, 证书中包含RSA的公钥，只有server有证书中公钥对应的私钥; client收到证书后，对证书进行校验(PKI体系一层层往CA验证，直到根CA)，校验通过后，用证书中的公钥对预主密钥(client每次随机生成)进行加密，将加密后的数据发送给server； 只有serv">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-03-20T12:26:48.554Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PSK相关">
+<meta name="twitter:description" content="1. 为什么TLS通常用证书体系(PKI)进行认证，先回顾一下传统的RSA证书认证过程，  server发送证书给client, 证书中包含RSA的公钥，只有server有证书中公钥对应的私钥; client收到证书后，对证书进行校验(PKI体系一层层往CA验证，直到根CA)，校验通过后，用证书中的公钥对预主密钥(client每次随机生成)进行加密，将加密后的数据发送给server； 只有serv">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Morning~Sun。" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://suntus.github.io/2020/03/20/PSK相关/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>PSK相关 | Morning~Sun。</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-55322469-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-55322469-1');
+  </script>
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Morning~Sun。</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">ha</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://suntus.github.io/2020/03/20/PSK相关/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="suntus">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Morning~Sun。">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PSK相关
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-03-20 20:20 20:20:03" itemprop="dateCreated datePublished" datetime="2020-03-20T20:20:03+08:00">2020-03-20 20:20</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-03-20 20:26 20:26:48" itemprop="dateModified" datetime="2020-03-20T20:26:48+08:00">2020-03-20 20:26</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-为什么"><a href="#1-为什么" class="headerlink" title="1. 为什么"></a>1. 为什么</h1><p>TLS通常用证书体系(PKI)进行认证，先回顾一下传统的RSA证书认证过程，</p>
+<ol>
+<li>server发送证书给client, 证书中包含RSA的公钥，只有server有证书中公钥对应的私钥;</li>
+<li>client收到证书后，对证书进行校验(PKI体系一层层往CA验证，直到根CA)，校验通过后，用证书中的公钥对预主密钥(client每次随机生成)进行加密，将加密后的数据发送给server；</li>
+<li>只有server能解密数据，取出其中的预主密钥。这样，server和client之间就有了共同的秘钥，可以用于后续的加密了。<a id="more"></a>
+这里的关键是只有server有对应的RSA私钥，然后server的RSA公钥可以由信任的根CA一层层校验，这样，client就可以认为它正在通信的对方是自己想要通信的server。server对client进行的过程认证基本一样。</li>
+</ol>
+<p>但使用证书有几个问题：</p>
+<ol>
+<li>证书需要非对称算法，不管是RSA还是ECC，加密相同强度都比对称算法慢；</li>
+<li>证书的PKI体系部署管理比较麻烦，需要根CA、子CA、server证书、证书私钥，client证书等；</li>
+<li>认证过程需要发送证书，证书通常比较大，需要传输时间比较长。</li>
+</ol>
+<p>所以，PSK就解决这样的问题:</p>
+<ol>
+<li>PSK可以只需要对称算法，不使用非对称算法；</li>
+<li>PSK在可控的封闭环境中容易部署；如果应用使用其他办法能生成一个共享的秘钥，PSK就可以用该秘钥建立TLS连接了;</li>
+<li>认证时PSK可以传输较小的数据量。</li>
+</ol>
+<h1 id="2-是什么"><a href="#2-是什么" class="headerlink" title="2. 是什么"></a>2. 是什么</h1><p>PSK——pre-shared key，预共享密钥——就是通信双方使用提前部署好的预共享密钥(用于对称算法)建立TLS连接的机制。</p>
+<p>PSK的主要逻辑是：</p>
+<ol>
+<li>分别在client和server部署相同的对称加密秘钥(<code>psk_key</code>)；</li>
+<li>每个<code>psk_key</code>对应有一个<code>psk_id</code>， client发送该<code>psk_id</code>给server,server通过<code>psk_id</code>查找对应的<code>psk_key</code>，如果查到，就用该<code>psk_key</code>去直接加密后续的数据，不再进行非对称加密。</li>
+</ol>
+<h1 id="3-TLS1-2及之前的PSK"><a href="#3-TLS1-2及之前的PSK" class="headerlink" title="3. TLS1.2及之前的PSK"></a>3. TLS1.2及之前的PSK</h1><p>PSK机制需要使用加密套件来确定是否使用PSK机制。<br>最开始的3组加密套件为:<br>| ciphersuite                       | key exchange | cipher       | hash |<br>|—————————————————-|———————|———————|———|<br>| TLS_PSK_WITH_RC4_128_SHA          | PSK          | RC4_128      | SHA  |<br>| TLS_PSK_WITH_3DES_EDE_CBC_SHA     | PSK          | 3DES_EDE_CBC | SHA  |<br>| TLS_PSK_WITH_AES_128_CBC_SHA      | PSK          | AES_128_CBC  | SHA  |<br>| TLS_PSK_WITH_AES_256_CBC_SHA      | PSK          | AES_256_CBC  | SHA  |<br>| TLS_DHE_PSK_WITH_RC4_128_SHA      | DHE_PSK      | RC4_128      | SHA  |<br>| TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA | DHE_PSK      | 3DES_EDE_CBC | SHA  |<br>| TLS_DHE_PSK_WITH_AES_128_CBC_SHA  | DHE_PSK      | AES_128_CBC  | SHA  |<br>| TLS_DHE_PSK_WITH_AES_256_CBC_SHA  | DHE_PSK      | AES_256_CBC  | SHA  |<br>| TLS_RSA_PSK_WITH_RC4_128_SHA      | RSA_PSK      | RC4_128      | SHA  |<br>| TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA | RSA_PSK      | 3DES_EDE_CBC | SHA  |<br>| TLS_RSA_PSK_WITH_AES_128_CBC_SHA  | RSA_PSK      | AES_128_CBC  | SHA  |<br>| TLS_RSA_PSK_WITH_AES_256_CBC_SHA  | RSA_PSK      | AES_256_CBC  | SHA  |</p>
+<p>是按照秘钥交换算法进行的分组，分别为<code>PSK, DHE_PSK, RSA_PSK</code>。</p>
+<ul>
+<li><code>PSK</code>是只是用对称加密算法，适合要求性能的地方；</li>
+<li><code>DHE_PSK</code>同时使用PSK和DHE算法，可以抵御字典攻击，也提供前向安全性；</li>
+<li><code>RSA_PSK</code>同时使用PSK和RSA算(还是使用RSA证书)，可以提供额外的认证。</li>
+</ul>
+<p>不同的秘钥交换算法使用的握手消息不太一样，下面分别详细说明。</p>
+<h2 id="3-1-PSK"><a href="#3-1-PSK" class="headerlink" title="3.1. PSK"></a>3.1. <code>PSK</code></h2><p>使用单独的PSK(<code>plain PSK</code>)进行协商的主要步骤如下:<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Client                              Server</span><br><span class="line">------                              ------</span><br><span class="line">ClientHello       --------&gt;</span><br><span class="line">                                ServerHello</span><br><span class="line">                                (Certificate)</span><br><span class="line">                                ServerKeyExchange*</span><br><span class="line">                                (CertificateRequest)</span><br><span class="line">                  &lt;--------     ServerHelloDone</span><br><span class="line">(Certificate)</span><br><span class="line">ClientKeyExchange</span><br><span class="line">(CertificateVerify)</span><br><span class="line">ChangeCipherSpec</span><br><span class="line">Finished          --------&gt;</span><br><span class="line">                                ChangeCipherSpec</span><br><span class="line">                  &lt;--------     Finished</span><br><span class="line">Application Data  &lt;-------&gt;     Application Data</span><br></pre></td></tr></table></figure></p>
+<ol>
+<li>client如果希望使用PSK进行握手，就在<code>CH</code>中加入PSK加密套件发送给server;</li>
+<li>server如果也希望使用PSK，就在<code>SH</code>中回复相应的PSK加密套件；</li>
+<li>server不再发送<code>Certificate</code>和<code>CertificateRequest</code>，因为这时候不需要证书了；</li>
+<li>client和server都可能有多组<code>psk_key</code>，server可以在<code>SKE</code>中发送一个<code>psk identity hint</code>的东西(类似索引之类的)帮助client去选择相应的<code>psk_key</code>；如果没有<code>psk identity hint</code>，就不发送<code>SKE</code>了；</li>
+<li>client把希望使用的<code>psk_key</code>对应的<code>psk_id</code>放到<code>CKE</code>中，发送给server;</li>
+<li>server收到<code>CKE</code>后，根据其中的<code>psk_id</code>选择相应的<code>psk_key</code>，然后将<code>psk_key</code>当做预主密钥(pre master secret)进行后续的秘钥推导；</li>
+</ol>
+<p>相关的消息格式:<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    select (KeyExchangeAlgorithm) &#123;</span><br><span class="line">    <span class="comment">/* other cases for rsa, diffie_hellman, etc. */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> psk: <span class="comment">/* NEW */</span></span><br><span class="line">        opaque psk_identity_hint&lt;<span class="number">0.</span><span class="number">.2</span>^<span class="number">16</span><span class="number">-1</span>&gt;;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125; ServerKeyExchange;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    select (KeyExchangeAlgorithm) &#123;</span><br><span class="line">    <span class="comment">/* other cases for rsa, diffie_hellman, etc. */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> psk: <span class="comment">/* NEW */</span></span><br><span class="line">        opaque psk_identity&lt;<span class="number">0.</span><span class="number">.2</span>^<span class="number">16</span><span class="number">-1</span>&gt;;</span><br><span class="line">    &#125; exchange_keys;</span><br><span class="line">&#125; ClientKeyExchange;</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-2-DHE-PSK"><a href="#3-2-DHE-PSK" class="headerlink" title="3.2. DHE_PSK"></a>3.2. <code>DHE_PSK</code></h2><p>协商的步骤跟<code>plain PSK</code>大体一致，其中：<br>\4. server不管有没有<code>psk identity hint</code>，都需要发送<code>SKE</code>，其中一定要包含server的DH秘钥交换参数；<br>\5. client把希望使用的<code>psk_key</code>对应的<code>psk_id</code>放到<code>CKE</code>中，并将client的DH秘钥交换参数一并放入发送给server;<br>\6. server收到<code>CKE</code>后，根据其中的<code>psk_id</code>选择相应的<code>psk_key</code>，并使用收到的DH参数生成DH的共享秘钥，然后跟<code>psk_key</code>一起构建出预主密钥(pre master secret)进行后续的秘钥推导；</p>
+<p>并且消息格式有差别：<br><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">struct &#123;</span><br><span class="line">    select (KeyExchangeAlgorithm) &#123;</span><br><span class="line">    <span class="comment">/* other cases for rsa, diffie_hellman, etc. */</span></span><br><span class="line"></span><br><span class="line">    case <span class="keyword">diffie_hellman_psk: </span><span class="comment">/* NEW */</span></span><br><span class="line">        opaque psk_identity_hint&lt;<span class="number">0</span>..<span class="number">2</span>^<span class="number">16</span>-1&gt;<span class="comment">;</span></span><br><span class="line">        ServerDHParams params<span class="comment">;</span></span><br><span class="line">    &#125;<span class="comment">;</span></span><br><span class="line">&#125; ServerKeyExchange<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">struct &#123;</span><br><span class="line">    select (KeyExchangeAlgorithm) &#123;</span><br><span class="line">    <span class="comment">/* other cases for rsa, diffie_hellman, etc. */</span></span><br><span class="line"></span><br><span class="line">    case <span class="keyword">diffie_hellman_psk: </span><span class="comment">/* NEW */</span></span><br><span class="line">        opaque psk_identity&lt;<span class="number">0</span>..<span class="number">2</span>^<span class="number">16</span>-1&gt;<span class="comment">;</span></span><br><span class="line">        ClientDiffieHellmanPublic public<span class="comment">;</span></span><br><span class="line">    &#125; exchange_keys<span class="comment">;</span></span><br><span class="line">&#125; ClientKeyExchange<span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
+<p>其中：</p>
+<ul>
+<li><p><code>ServerDHParams</code>：保存的是server临时生成的DH公开参数(其中<code>dh_Ys</code>相当于server的公钥)。格式为:</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">struct &#123;</span><br><span class="line">    opaque dh_p&lt;<span class="number">1.</span><span class="number">.2</span>^<span class="number">16</span><span class="number">-1</span>&gt;;</span><br><span class="line">    opaque dh_g&lt;<span class="number">1.</span><span class="number">.2</span>^<span class="number">16</span><span class="number">-1</span>&gt;;</span><br><span class="line">    opaque dh_Ys&lt;<span class="number">1.</span><span class="number">.2</span>^<span class="number">16</span><span class="number">-1</span>&gt;;</span><br><span class="line">&#125; ServerDHParams; <span class="comment">/* Ephemeral DH parameters */</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>ClientDiffieHellmanPublic</code>: client生成的DH公开参数(其中<code>dh_Yc</code>相当于client的公钥),格式为:</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">struct &#123;</span><br><span class="line">    <span class="keyword">select</span> (PublicValueEncoding) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="keyword">implicit</span>:</span><br><span class="line">        struct &#123; &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> explicit:</span><br><span class="line">        opaque dh_Yc&lt;<span class="number">1.</span><span class="number">.2</span>^<span class="number">16</span>-<span class="number">1</span>&gt;;</span><br><span class="line">    &#125; dh_public;</span><br><span class="line">&#125; ClientDiffieHellmanPublic;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="3-3-RSA-PSK"><a href="#3-3-RSA-PSK" class="headerlink" title="3.3. RSA_PSK"></a>3.3. <code>RSA_PSK</code></h2><p>协商的步骤跟<code>plain PSK</code>大体一致，其中：<br>\3. server需要发送包含RSA证书的<code>Certificate</code>；<br>\5. client把希望使用的<code>psk_key</code>对应的<code>psk_id</code>放到<code>CKE</code>中，并生成一串随机数<code>secret</code>，用serve证书中的公钥加密，一并发送给server;<br>\6. server收到<code>CKE</code>后，根据其中的<code>psk_id</code>选择相应的<code>psk_key</code>，并使用RSA私钥对其中的加密数据解密，得到一个跟client共享的秘钥，然后跟<code>psk_key</code>一起构建出预主密钥(pre master secret)进行后续的秘钥推导；</p>
+<p>消息格式为：<br><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">struct &#123;</span><br><span class="line">    select (KeyExchangeAlgorithm) &#123;</span><br><span class="line">    <span class="comment">/* other cases for rsa, diffie_hellman, etc. */</span></span><br><span class="line"></span><br><span class="line">    case rsa_psk: <span class="comment">/* NEW */</span></span><br><span class="line">        opaque psk_identity_hint&lt;<span class="number">0</span>..<span class="number">2</span>^<span class="number">16</span>-1&gt;<span class="comment">;</span></span><br><span class="line">    &#125;<span class="comment">;</span></span><br><span class="line">&#125; ServerKeyExchange<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">struct &#123;</span><br><span class="line">    select (KeyExchangeAlgorithm) &#123;</span><br><span class="line">    <span class="comment">/* other cases for rsa, diffie_hellman, etc. */</span></span><br><span class="line"></span><br><span class="line">    case rsa_psk: <span class="comment">/* NEW */</span></span><br><span class="line">        opaque psk_identity&lt;<span class="number">0</span>..<span class="number">2</span>^<span class="number">16</span>-1&gt;<span class="comment">;</span></span><br><span class="line">        EncryptedPreMasterSecret<span class="comment">;</span></span><br><span class="line">    &#125; exchange_keys<span class="comment">;</span></span><br><span class="line">&#125; ClientKeyExchange<span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
+<p>其中<code>EncryptedPreMasterSecret</code>格式见<code>rfc2246-tls1.0</code>。</p>
+<h2 id="3-4-使用PSK构建预主密钥"><a href="#3-4-使用PSK构建预主密钥" class="headerlink" title="3.4. 使用PSK构建预主密钥"></a>3.4. 使用PSK构建预主密钥</h2><p>使用PSK构建预主密钥的通用格式为:<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct &#123;</span><br><span class="line">    opaque other_secret&lt;<span class="number">0.</span><span class="number">.2</span>^<span class="number">16</span><span class="number">-1</span>&gt;;</span><br><span class="line">    opaque psk&lt;<span class="number">0.</span><span class="number">.2</span>^<span class="number">16</span><span class="number">-1</span>&gt;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>其中<code>psk</code>就是根据<code>psk_id</code>查找出来的对应的<code>psk_key</code>，而<code>other_secret</code>是根据不同的秘钥交换算法而定的：</p>
+<ul>
+<li><code>PSK</code>: 跟psk相同长度的0字节串；</li>
+<li><code>DHE_PSK</code>: client和server使用DH交换参数生成了共享秘钥<code>Z</code>，去掉<code>Z</code>的前导0，将其填入<code>other_secret</code>中；</li>
+<li><code>RSA_PSK</code>: client生成的随机secret，用RSA公钥加密后发送给server，这样就得出了共享秘钥，将其填入<code>other_secret</code>中。</li>
+</ul>
+<h1 id="4-TLS1-3的PSK"><a href="#4-TLS1-3的PSK" class="headerlink" title="4. TLS1.3的PSK"></a>4. TLS1.3的PSK</h1><p>TLS1.3的PSK机制改变很大，虽然也有一部分之前TLS版本的PSK的功能，但还整合了其他功能：</p>
+<ol>
+<li>TLS1.2的PSK相当于外部导入PSK机制，用户预先在client和server部署<code>psk_key</code>(手动部署或使用其他秘钥交换算法进行)。TLS1.3也保留了这部分功能，支持外部导入；</li>
+<li>TLS1.2使用的session ID(server有状态)和ticket(server无状态)的会话恢复机制，现在统一整合到PSK中，这时候相当于<code>psk_key</code>从上次完整会话中生成。</li>
+<li>PSK还用于支持TLS1.3特有的<code>0-RTT</code>早期数据，通过牺牲前向安全性，来在client发起连接时，使用PSK的<code>psk_key</code>直接加密用户数据，发给server，server可以直接使用查找得到的<code>psk_key</code>解密数据。加快应用数据的交换过程。</li>
+</ol>
+<p>用于不同目的的PSK在细节处有些不一样，下面分别说明。</p>
+<h2 id="4-1-外部导入PSK"><a href="#4-1-外部导入PSK" class="headerlink" title="4.1. 外部导入PSK"></a>4.1. 外部导入PSK</h2><h3 id="4-1-1-协商过程"><a href="#4-1-1-协商过程" class="headerlink" title="4.1.1 协商过程"></a>4.1.1 协商过程</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">client                                      server</span><br><span class="line">ClientHello</span><br><span class="line">    + key_share*</span><br><span class="line">    + psk_key_exchange_modes</span><br><span class="line">    + pre_shared_key        --------&gt;</span><br><span class="line">                                            ServerHello</span><br><span class="line">                                                + pre_shared_key</span><br><span class="line">                                                + key_share*</span><br><span class="line">                                            &#123;EncryptedExtensions&#125;</span><br><span class="line">                                            &#123;Finished&#125;</span><br><span class="line">                            &lt;--------       [Application Data*]</span><br><span class="line">&#123;Finished&#125;                  --------&gt;</span><br><span class="line"></span><br><span class="line">[Application Data]          &lt;-------&gt;       [Application Data]</span><br></pre></td></tr></table></figure>
+<ol>
+<li>client如果希望使用PSK进行握手，就在<code>CH</code>中加入<code>psk_key_exchange_modes</code>和<code>pre_shared_key</code>扩展项，其中<code>psk_key_exchange</code>指示是使用单纯的PSK还是同时使用PSK和DHE进行秘钥交换;<code>pre_shared_key</code>中存放的就是之前的<code>psk_id</code>和一些相关信息；如果是<code>psk_ke</code>就不需要发送<code>key_share</code>扩展了，如果是<code>psk_dhe_ke</code>，还需要发送<code>key_share</code>扩展，以携带DHE相关的参数；</li>
+<li>server如果也希望使用PSK，就在<code>SH</code>中回复选择哪个<code>psk_id</code>；</li>
+<li>server不再发送<code>Certificate</code>和<code>CertificateRequest</code>，因为这时候不需要证书了；</li>
+<li>client和server可以从<code>psk_ke</code>和<code>psk_dhe_ke</code>两种秘钥交换算法中得出共享的秘钥，然后使用它进行其他秘钥推导。</li>
+</ol>
+<p>相关的消息格式为：</p>
+<h3 id="4-1-2-psk-key-exchange-modes扩展项格式"><a href="#4-1-2-psk-key-exchange-modes扩展项格式" class="headerlink" title="4.1.2. psk_key_exchange_modes扩展项格式"></a>4.1.2. <code>psk_key_exchange_modes</code>扩展项格式</h3><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> &#123; <span class="title">psk_ke</span>(0), <span class="title">psk_dhe_ke</span>(1), (255) &#125; <span class="title">PskKeyExchangeMode</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    PskKeyExchangeMode ke_modes&lt;<span class="number">1</span>..<span class="number">255</span>&gt;;</span><br><span class="line">&#125; PskKeyExchangeModes;</span><br></pre></td></tr></table></figure>
+<p>其中:</p>
+<ul>
+<li><code>psk_ke</code>：类似于于TLS1.2的<code>plain PSK</code>机制，就是只使用PSK进行认证协商，不使用其他秘钥交换算法。这时候不能发送<code>key_share</code>扩展了。</li>
+<li><code>psk_dhe_ke</code>：类似于TLS1.2的<code>DHE_PSK</code>机制，同时使用DH和PSK进行认证协商。必须同时发送<code>key_share</code>。</li>
+</ul>
+<h3 id="4-1-3-pre-shared-key扩展项格式"><a href="#4-1-3-pre-shared-key扩展项格式" class="headerlink" title="4.1.3. pre_shared_key扩展项格式"></a>4.1.3. <code>pre_shared_key</code>扩展项格式</h3><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">struct &#123;</span><br><span class="line">    select (Handshake.msg_type) &#123;</span><br><span class="line">    case client_hello:</span><br><span class="line">        OfferedPsks<span class="comment">;</span></span><br><span class="line">    case server_hello:</span><br><span class="line">        uint16 selected_identity<span class="comment">;</span></span><br><span class="line">    &#125;<span class="comment">;</span></span><br><span class="line">&#125; PreSharedKeyExtension<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">struct &#123;</span><br><span class="line">    PskIdentity identities&lt;<span class="number">7</span>..<span class="number">2</span>^<span class="number">16</span>-1&gt;<span class="comment">;</span></span><br><span class="line">    PskBinderEntry <span class="keyword">binders&lt;33..2^16-1&gt;;</span></span><br><span class="line"><span class="keyword">&#125; </span>OfferedPsks<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">struct &#123;</span><br><span class="line">    opaque identity&lt;<span class="number">1</span>..<span class="number">2</span>^<span class="number">16</span>-1&gt;<span class="comment">;</span></span><br><span class="line">    uint32 obfuscated_ticket_age<span class="comment">;</span></span><br><span class="line">&#125; PskIdentity<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">opaque PskBinderEntry&lt;<span class="number">32</span>..<span class="number">255</span>&gt;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>其中：</p>
+<ul>
+<li><code>identity</code>: 跟TLS1.2中<code>psk_id</code>效果类似，都是用于查找相应的<code>psk_key</code>的；但由于TLS1.3集成了会话恢复的功能，会有一些其他内容：1）如果是外部导入PSK，这个值就是TLS1.2一样的<code>psk_id</code>，用以查找相应的<code>psk_key</code>。2）如果是用于会话恢复的PSK，分为session ID和ticket实现机制，如果是session ID机制，这里存放的相当于TLS1.2中的session ID，用于指导server查找相应的session加密状态；如果是ticket实现机制，这里存放的就是TLS1.2的ticket，server收到之后，使用ticket中的<code>key_name</code>查找对应的解密秘钥，解密出ticket中的内容，进而恢复session加密状态。但总体来看，client和server可以通过<code>identity</code>得到相应的加密状态——不管是外部导入，还是会话恢复。</li>
+<li><code>obfuscated_ticket_age</code>: client计算<code>psk_key</code>已存活的时间，使用一种混淆方式。如果是外部导入PSK，值是0；如果是用于会话恢复的PSK，值的计算见下边<code>NewSessionTicket</code>。</li>
+<li><code>identities</code>: client可能会提供多个psk供server选择，所以这是个列表。如果client同时发送了0-RTT数据，那应用数据就必须使用第1个psk去加密(编号从0开始)。</li>
+<li><code>binders</code>: 使用每个PSK的<code>psk_key</code>对当前trans-hash计算的一个HMAC值，用于将PSK和当前握手绑定到一起。计算顺序跟<code>identities</code>中的一样。</li>
+<li><code>selected_identity</code>: server希望使用哪个psk进行后续握手，填编号，编号从0开始。</li>
+</ul>
+<h3 id="4-1-4-binders计算"><a href="#4-1-4-binders计算" class="headerlink" title="4.1.4. binders计算"></a>4.1.4. <code>binders</code>计算</h3><p>主要使用HMAC计算，HMAC详细过程见<a href="/2019/05/09/HKDF算法/" title="HKDF算法">HKDF算法</a>。<br>这里，需要计算的数据需要注意：</p>
+<ol>
+<li>如果是计算第一个<code>ClientHello</code>中的psk binder，需要先计算<code>Truncate(ClientHello1)</code>——<code>pre_shared_key</code>扩展项按要求必须放在<code>ClientHello</code>最后，也就是说，其中的<code>psk_binder</code>是在最后的最后，只去掉binders列表，剩下的前边的<code>ClientHello</code>就是<code>Truncate(ClientHello)</code>了。这里<code>ClientHello</code>消息中前边的长度值也需要填好，因为最后计算的binder都是按照HMAC中的hash算法输出的长度，所以长度在计算HMAC值之前就可以确定下来了。在计算<code>Transcript-Hash(Truncate(ClientHello1))</code>，然后使用HMAC对结果进行计算，得到一个个binder值；</li>
+<li>如果是server发送了HRR，需要对<code>Transcript-Hash(ClientHello, HelloRetryRequest, Truncate(ClientHello2)))</code>进行HMAC，这里的<code>ClientHello1</code>是重组后的<code>&quot;message_hash&quot;</code>结构，见TLS1.3的RFC。</li>
+</ol>
+<p>计算时使用的hash算法：</p>
+<ol>
+<li>如果是外部导入的PSK，需要用户提供一个对应的HASH算法，没有提供就默认SHA256；</li>
+<li>如果是上次会话生成的PSK，就用上次会话使用的加密套件中的HASH算法。</li>
+</ol>
+<p>使用的秘钥如何生成后续再完整描述。</p>
+<h2 id="4-2-会话恢复PSK"><a href="#4-2-会话恢复PSK" class="headerlink" title="4.2. 会话恢复PSK"></a>4.2. 会话恢复PSK</h2><h3 id="4-2-1-协商过程"><a href="#4-2-1-协商过程" class="headerlink" title="4.2.1. 协商过程"></a>4.2.1. 协商过程</h3><figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml">// 第一次协商</span></span><br><span class="line"><span class="xml">client                                      server</span></span><br><span class="line"><span class="xml">ClientHello</span></span><br><span class="line"><span class="xml">    + key_share             --------&gt;</span></span><br><span class="line"><span class="xml">                                            ServerHello</span></span><br><span class="line"><span class="xml">                                                + key_share</span></span><br><span class="line"><span class="xml">                                            </span><span class="template-variable">&#123;EncryptedExtensions&#125;</span><span class="xml"></span></span><br><span class="line"><span class="xml">                                            </span><span class="template-variable">&#123;CertificateRequest*&#125;</span><span class="xml"></span></span><br><span class="line"><span class="xml">                                            </span><span class="template-variable">&#123;Certificate*&#125;</span><span class="xml"></span></span><br><span class="line"><span class="xml">                                            </span><span class="template-variable">&#123;CertificateVerify*&#125;</span><span class="xml"></span></span><br><span class="line"><span class="xml">                                            </span><span class="template-variable">&#123;Finished&#125;</span><span class="xml"></span></span><br><span class="line"><span class="xml">                            <span class="tag">&lt;<span class="name">--------</span>       [<span class="attr">Application</span> <span class="attr">Data</span>*]</span></span></span><br><span class="line"><span class="xml"></span><span class="template-variable">&#123;Certificate*&#125;</span><span class="xml"></span></span><br><span class="line"><span class="xml"></span><span class="template-variable">&#123;CertificateVerify*&#125;</span><span class="xml"></span></span><br><span class="line"><span class="xml"></span><span class="template-variable">&#123;Finished&#125;</span><span class="xml">                  --------&gt;</span></span><br><span class="line"><span class="xml">                            <span class="tag">&lt;<span class="name">--------</span>       [<span class="attr">NewSessionTicket</span>]</span></span></span><br><span class="line"><span class="xml">[Application Data]          <span class="tag">&lt;<span class="name">-------</span>&gt;</span>       [Application Data]</span></span><br><span class="line"><span class="xml"></span></span><br><span class="line"><span class="xml">// 第二次协商</span></span><br><span class="line"><span class="xml">client                                      server</span></span><br><span class="line"><span class="xml">ClientHello</span></span><br><span class="line"><span class="xml">    + key_share*</span></span><br><span class="line"><span class="xml">    + psk_key_exchange_modes</span></span><br><span class="line"><span class="xml">    + pre_shared_key        --------&gt;</span></span><br><span class="line"><span class="xml">                                            ServerHello</span></span><br><span class="line"><span class="xml">                                                + pre_shared_key</span></span><br><span class="line"><span class="xml">                                                + key_share*</span></span><br><span class="line"><span class="xml">                                            </span><span class="template-variable">&#123;EncryptedExtensions&#125;</span><span class="xml"></span></span><br><span class="line"><span class="xml">                                            </span><span class="template-variable">&#123;Finished&#125;</span><span class="xml"></span></span><br><span class="line"><span class="xml">                            <span class="tag">&lt;<span class="name">--------</span>       [<span class="attr">Application</span> <span class="attr">Data</span>*]</span></span></span><br><span class="line"><span class="xml"></span><span class="template-variable">&#123;Finished&#125;</span><span class="xml">                  --------&gt;</span></span><br><span class="line"><span class="xml"></span></span><br><span class="line"><span class="xml">[Application Data]          <span class="tag">&lt;<span class="name">-------</span>&gt;</span>       [Application Data]</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li>第一次完整握手，server会发送证书等相关信息，进行认证握手。在协商完成后，server会发送<code>NewSessionTicket</code>给client，其中携带的有session ID或ticket；</li>
+<li>第二次会话恢复，流程跟外部导入PSK一致，只不过其中PSK中的<code>psk_key</code>不再是外部导入，而是上次会话生成的。</li>
+</ol>
+<h3 id="4-2-2-NewSessionTicket消息格式"><a href="#4-2-2-NewSessionTicket消息格式" class="headerlink" title="4.2.2. NewSessionTicket消息格式"></a>4.2.2. <code>NewSessionTicket</code>消息格式</h3><p>见<a href="/2020/03/14/ticket相关/" title="ticket相关">ticket相关</a>。</p>
+<h2 id="4-3-支持早期数据"><a href="#4-3-支持早期数据" class="headerlink" title="4.3. 支持早期数据"></a>4.3. 支持早期数据</h2><h3 id="4-3-1-协商流程"><a href="#4-3-1-协商流程" class="headerlink" title="4.3.1. 协商流程"></a>4.3.1. 协商流程</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">Client                                      Server</span><br><span class="line">ClientHello</span><br><span class="line">    + early_data</span><br><span class="line">    + key_share*</span><br><span class="line">    + psk_key_exchange_modes</span><br><span class="line">    + pre_shared_key</span><br><span class="line">(Application Data*)         --------&gt;</span><br><span class="line">                                            ServerHello</span><br><span class="line">                                                + pre_shared_key</span><br><span class="line">                                                + key_share*</span><br><span class="line">                                            &#123;EncryptedExtensions&#125;</span><br><span class="line">                                                + early_data*</span><br><span class="line">                                            &#123;Finished&#125;</span><br><span class="line">                            &lt;--------       [Application Data*]</span><br><span class="line">(EndOfEarlyData)</span><br><span class="line">&#123;Finished&#125;                  --------&gt;</span><br><span class="line"></span><br><span class="line">[Application Data]          &lt;-------&gt;       [Application Data]</span><br></pre></td></tr></table></figure>
+<ol>
+<li>client使用<code>pre_shared_key</code>中的第一个<code>psk_key</code>对用户数据进行加密。其他流程不变。</li>
+</ol>
+<h2 id="4-4-其他"><a href="#4-4-其他" class="headerlink" title="4.4. 其他"></a>4.4. 其他</h2><h3 id="4-4-1-PSK跟server-name的关系"><a href="#4-4-1-PSK跟server-name的关系" class="headerlink" title="4.4.1. PSK跟server_name的关系"></a>4.4.1. PSK跟<code>server_name</code>的关系</h3><p>TLS1.3之前的版本中，SNI应该是跟session状态绑定到一起的，也就是说，每次会话恢复的时候，还是使用之前保存的session状态中的SNI，用户不能再重新设置。但很多实现没有处理好，导致恢复的SNI和用户提供的SNI不一致，这样SNI的最终确定是由client进行判断的。<br>TLS1.3中的SNI强制跟session绑定到一起，在会话恢复中必须明确带上SNI，而server不需要将SNI存储到ticket中，每次都根据<code>CH</code>去重新选择。</p>
+<h1 id="5-openssl关于PSK的API"><a href="#5-openssl关于PSK的API" class="headerlink" title="5. openssl关于PSK的API"></a>5. openssl关于PSK的API</h1><p>这里只是有关外部的导入PSK的相关操作。会话恢复的一些操作见<a href="/2020/03/14/ticket相关/" title="ticket相关">ticket相关</a>。</p>
+<h2 id="5-1-设置client期望使用的PSK"><a href="#5-1-设置client期望使用的PSK" class="headerlink" title="5.1. 设置client期望使用的PSK"></a>5.1. 设置client期望使用的PSK</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;openssl/ssl.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="title">int</span> <span class="params">(*SSL_psk_client_cb_func)</span><span class="params">(SSL *ssl,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">const</span> <span class="keyword">char</span> *hint,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">char</span> *identity,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">unsigned</span> <span class="keyword">int</span> max_identity_len,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">unsigned</span> <span class="keyword">char</span> *psk,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">unsigned</span> <span class="keyword">int</span> max_psk_len)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SSL_CTX_set_psk_client_callback</span><span class="params">(SSL_CTX *ctx, SSL_psk_client_cb_func cb)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SSL_set_psk_client_callback</span><span class="params">(SSL *ssl, SSL_psk_client_cb_func cb)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>这俩函数也能用于TLS1.3，但建议限于TLS1.2及之前的client的PSK设置。<br>回调函数在TLS1.2的触发时机：</p>
+<ol>
+<li>client发送<code>SKE</code>的时候，会触发该回调。其中<code>hint</code>是server发给client的<code>psk_identity_hint</code>字符串，应用根据<code>hint</code>挑选相应的PSK，把选中的PSK的<code>psk_id</code>放入<code>*identity</code>中，在<code>psk</code>中放入相应的<code>psk_key</code>。</li>
+</ol>
+<p>回调函数返回0表示成功，同样设置了有效的<code>psk</code>的话，可以使用PSK。返回其他值会导致握手失败。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;openssl/ssl.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">int</span> <span class="params">(*SSL_psk_use_session_cb_func)</span><span class="params">(SSL *ssl, <span class="keyword">const</span> EVP_MD *md,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> **id,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        <span class="keyword">size_t</span> *idlen,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        SSL_SESSION **sess)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SSL_CTX_set_psk_use_session_callback</span><span class="params">(SSL_CTX *ctx,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        SSL_psk_use_session_cb_func cb)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SSL_set_psk_use_session_callback</span><span class="params">(SSL *s, SSL_psk_use_session_cb_func cb)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>这俩函数只限于TLS1.3的PSK。<br>回调函数<code>SSL_psk_use_session_cb_func()</code>触发时机:</p>
+<ol>
+<li>client发送<code>CH</code>的时候，在组建PSK相关扩展项时，会触发一次，这时候<code>md</code>是<code>NULL</code>, 用户需要在回调中将希望使用的<code>psk_id</code>放到<code>**id</code>中，将PSK的其他相关信息放到<code>**sess</code>中。<code>*id</code>指向的内存还是由应用管理，但用户在握手完成之后才能删除它。</li>
+<li>在client收到<code>SH</code>后，如果server也期望使用PSK，则会回复<code>pre_share_key</code>扩展，这时候会再触发一次，这时候server已经协商出了一个加密套件，其中的摘要算法会在<code>md</code>中给应用提供，应用提供的PSK中的摘要算法必须跟给出的一样，否则就不能使用。两次触发时应用返回的PSK可以不一样。</li>
+</ol>
+<p><code>**sess</code>指向的<code>SSL_SESSION</code>中至少要有以下信息：</p>
+<ul>
+<li><code>master key</code>：可以用<code>SSL_SESSION_set1_master_key()</code>去设置，就是设置<code>psk_key</code>的；</li>
+<li><code>ciphersuite</code>：一个加密套件，PSK只关心其中的摘要算法(hash)，因为后续计算PSK binder的时候会用到，server也会根据相应的摘要算法选择最后协商的加密套件。可以设置任何TLS1.3的加密套件。</li>
+<li><code>protocol version</code>: 只能是<code>TLS1_3_VERSION</code>。</li>
+<li>如果需要支持PSK，需要用<code>SSL_SESSION_set_max_early_data()</code>设置早期数据最大长度。</li>
+</ul>
+<p>在回调中返回正确，但不返回<code>sess</code>，说明应用想继续握手，但不想用PSK。返回失败会导致握手失败。</p>
+<h2 id="5-2-在server中选择PSK"><a href="#5-2-在server中选择PSK" class="headerlink" title="5.2. 在server中选择PSK"></a>5.2. 在server中选择PSK</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;openssl/ssl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="title">int</span> <span class="params">(*SSL_psk_server_cb_func)</span><span class="params">(SSL *ssl,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">const</span> <span class="keyword">char</span> *identity,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">unsigned</span> <span class="keyword">char</span> *psk,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">unsigned</span> <span class="keyword">int</span> max_psk_len)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">SSL_CTX_use_psk_identity_hint</span><span class="params">(SSL_CTX *ctx, <span class="keyword">const</span> <span class="keyword">char</span> *hint)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">SSL_use_psk_identity_hint</span><span class="params">(SSL *ssl, <span class="keyword">const</span> <span class="keyword">char</span> *hint)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SSL_CTX_set_psk_server_callback</span><span class="params">(SSL_CTX *ctx, SSL_psk_server_cb_func cb)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SSL_set_psk_server_callback</span><span class="params">(SSL *ssl, SSL_psk_server_cb_func cb)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>TLS1.2及以前用这俩函数。<br>了解PSK机制和client端的设置的话，这里的就很容易看懂了。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;openssl/ssl.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">int</span> <span class="params">(*SSL_psk_find_session_cb_func)</span><span class="params">(SSL *ssl,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> *identity,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">size_t</span> identity_len,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            SSL_SESSION **sess)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SSL_CTX_set_psk_find_session_callback</span><span class="params">(SSL_CTX *ctx,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        SSL_psk_find_session_cb_func cb)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SSL_set_psk_find_session_callback</span><span class="params">(SSL *s, SSL_psk_find_session_cb_func cb)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>TLS1.3尽量用这俩函数。<br>回调函数在server收到<code>CH</code>时处理，lib会将<code>psk_id</code>放到<code>identity</code>中，返回给应用，应用根据<code>identity</code>去选择相应的PSK,将PSK的相关信息存储到<code>sess</code>中，返回给lib。<code>sess</code>中相关信息见上边client的配置。</p>
+<h1 id="6-其他"><a href="#6-其他" class="headerlink" title="6. 其他"></a>6. 其他</h1><ol>
+<li>以上只是针对正常逻辑，具体的异常逻辑需要查阅相应RFC。</li>
+<li>理解这些协议机制，其实就是了解过程和相应的数据结构，就差不多了。</li>
+</ol>
+<h1 id="7-参考"><a href="#7-参考" class="headerlink" title="7. 参考"></a>7. 参考</h1><ol>
+<li>PSK的RFC: <a href="https://tools.ietf.org/html/rfc4279" target="_blank" rel="noopener">RFC4279-Pre-Shared Key Ciphersuites for Transport Layer Security (TLS)</a></li>
+<li><code>ServerDHParams</code>格式: <a href="https://tools.ietf.org/html/rfc2246" target="_blank" rel="noopener">RFC2246-tls1.0</a></li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+    <div>
+ 
+ 
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+      <strong>本文作者：</strong>suntus
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="/2020/03/20/PSK相关/" title="PSK相关">2020/03/20/PSK相关/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权： </strong>
+    本站文章均采用 <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0 CN</a> 许可协议，请勿用于商业，转载注明出处！
+  </li>
+</ul>
+
+</div>
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tls/" rel="tag"># tls</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/14/TLS中ChangeCipherSpec为什么是个单独的协议类型/" rel="next" title="TLS中ChangeCipherSpec为什么是个单独的协议类型">
+                <i class="fa fa-chevron-left"></i> TLS中ChangeCipherSpec为什么是个单独的协议类型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/20/不定长参数/" rel="prev" title="不定长参数">
+                不定长参数 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">suntus</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">85</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">20</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-为什么"><span class="nav-text">1. 为什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-是什么"><span class="nav-text">2. 是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-TLS1-2及之前的PSK"><span class="nav-text">3. TLS1.2及之前的PSK</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-PSK"><span class="nav-text">3.1. PSK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-DHE-PSK"><span class="nav-text">3.2. DHE_PSK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-RSA-PSK"><span class="nav-text">3.3. RSA_PSK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-使用PSK构建预主密钥"><span class="nav-text">3.4. 使用PSK构建预主密钥</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-TLS1-3的PSK"><span class="nav-text">4. TLS1.3的PSK</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-外部导入PSK"><span class="nav-text">4.1. 外部导入PSK</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-1-协商过程"><span class="nav-text">4.1.1 协商过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-2-psk-key-exchange-modes扩展项格式"><span class="nav-text">4.1.2. psk_key_exchange_modes扩展项格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-3-pre-shared-key扩展项格式"><span class="nav-text">4.1.3. pre_shared_key扩展项格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-4-binders计算"><span class="nav-text">4.1.4. binders计算</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-会话恢复PSK"><span class="nav-text">4.2. 会话恢复PSK</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-1-协商过程"><span class="nav-text">4.2.1. 协商过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-2-NewSessionTicket消息格式"><span class="nav-text">4.2.2. NewSessionTicket消息格式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-支持早期数据"><span class="nav-text">4.3. 支持早期数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-1-协商流程"><span class="nav-text">4.3.1. 协商流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-其他"><span class="nav-text">4.4. 其他</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-1-PSK跟server-name的关系"><span class="nav-text">4.4.1. PSK跟server_name的关系</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-openssl关于PSK的API"><span class="nav-text">5. openssl关于PSK的API</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-设置client期望使用的PSK"><span class="nav-text">5.1. 设置client期望使用的PSK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-在server中选择PSK"><span class="nav-text">5.2. 在server中选择PSK</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-其他"><span class="nav-text">6. 其他</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-参考"><span class="nav-text">7. 参考</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">suntus</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -96,18 +96,18 @@
 
 
 
-  <meta name="description" content="重定向没什么难理解的，只是有些命令会不熟悉，这里列出了一些常用的命令，以备后查。 标准输入：键盘，0标准输出：屏幕，1标准错误：屏幕，2">
-<meta name="keywords" content="linux">
+  <meta name="description" content="1. 介绍使用特定函数操作不定长列表，初始化——操作——结束。">
+<meta name="keywords" content="c">
 <meta property="og:type" content="article">
-<meta property="og:title" content="shell IO重定向">
-<meta property="og:url" content="http://suntus.github.io/2017/09/22/shell IO重定向/index.html">
+<meta property="og:title" content="不定长参数">
+<meta property="og:url" content="http://suntus.github.io/2020/03/20/不定长参数/index.html">
 <meta property="og:site_name" content="Morning~Sun。">
-<meta property="og:description" content="重定向没什么难理解的，只是有些命令会不熟悉，这里列出了一些常用的命令，以备后查。 标准输入：键盘，0标准输出：屏幕，1标准错误：屏幕，2">
+<meta property="og:description" content="1. 介绍使用特定函数操作不定长列表，初始化——操作——结束。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-09-25T04:02:53.000Z">
+<meta property="og:updated_time" content="2020-03-20T12:37:34.240Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="shell IO重定向">
-<meta name="twitter:description" content="重定向没什么难理解的，只是有些命令会不熟悉，这里列出了一些常用的命令，以备后查。 标准输入：键盘，0标准输出：屏幕，1标准错误：屏幕，2">
+<meta name="twitter:title" content="不定长参数">
+<meta name="twitter:description" content="1. 介绍使用特定函数操作不定长列表，初始化——操作——结束。">
 
 
 
@@ -116,7 +116,7 @@
 
 
 
-  <link rel="canonical" href="http://suntus.github.io/2017/09/22/shell IO重定向/">
+  <link rel="canonical" href="http://suntus.github.io/2020/03/20/不定长参数/">
 
 
 
@@ -126,7 +126,7 @@
   };
 </script>
 
-  <title>shell IO重定向 | Morning~Sun。</title>
+  <title>不定长参数 | Morning~Sun。</title>
   
 
 
@@ -320,7 +320,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://suntus.github.io/2017/09/22/shell IO重定向/">
+    <link itemprop="mainEntityOfPage" href="http://suntus.github.io/2020/03/20/不定长参数/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="suntus">
@@ -337,7 +337,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">shell IO重定向
+          <h1 class="post-title" itemprop="name headline">不定长参数
 
               
             
@@ -363,24 +363,12 @@
                 
               
 
-              <time title="创建时间：2017-09-22 11:49 11:49:02" itemprop="dateCreated datePublished" datetime="2017-09-22T11:49:02+08:00">2017-09-22 11:49</time>
+              <time title="创建时间：2020-03-20 20:37 20:37:04 / 修改时间：20:37:34" itemprop="dateCreated datePublished" datetime="2020-03-20T20:37:04+08:00">2020-03-20 20:37</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2017-09-25 12:02 12:02:53" itemprop="dateModified" datetime="2017-09-25T12:02:53+08:00">2017-09-25 12:02</time>
               
             
           </span>
@@ -414,26 +402,17 @@
       
 
       
-        <p>重定向没什么难理解的，只是有些命令会不熟悉，这里列出了一些常用的命令，以备后查。</p>
-<p>标准输入：键盘，0<br>标准输出：屏幕，1<br>标准错误：屏幕，2<br><a id="more"></a></p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">ls</span> 1&gt; <span class="selector-tag">haha</span><span class="selector-class">.txt</span></span><br></pre></td></tr></table></figure>
-<p>将标准输出1重定向到文件haha.txt。注意1和&gt;之间没有空格。1可以省略，就成了常用的 ls &gt; haha.txt</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls <span class="number">1</span><span class="meta">&gt;&gt;</span>haha.txt</span><br></pre></td></tr></table></figure>
-<p>1个&gt;是先清空haha.txt，再写入；两个&gt;是追加到haha.txt后边</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">ls</span> <span class="selector-tag">-qw</span> 2&gt; <span class="selector-tag">haha</span><span class="selector-class">.txt</span></span><br></pre></td></tr></table></figure>
-<p>将标准错误重定向到haha.txt</p>
-<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls <span class="meta">&amp;&gt; haha.txt</span></span><br></pre></td></tr></table></figure>
-<p>将标准输出、标准错误都重定向到haha.txt</p>
-<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">i</span>&gt;&amp;<span class="built_in">j</span></span><br></pre></td></tr></table></figure>
-<p>将文件描述符i重定向到描述符j，也就是现在j也具有了i的能力，应用到i上的IO操作都可以应用到j上，效果一样。</p>
-<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#echo <span class="number">123456789</span> &gt;filename   把字符串写到文件filename中</span><br><span class="line">#exec <span class="number">3</span>&lt;&gt;filename           把文件filename打开，并指定文件标识符为<span class="number">3</span></span><br><span class="line">#read -n <span class="number">4</span> &lt;&amp;<span class="number">3</span>              从文件中读<span class="number">4</span>个字符，句柄已经指到第四个字符末尾</span><br><span class="line">#echo -n . &gt;&amp;<span class="number">3</span>              在第<span class="number">5</span>个字符处写一个点，覆盖第<span class="number">5</span>个字符，-n表示不换行</span><br><span class="line">#exec <span class="number">3</span>&gt;&amp;-                 关闭文件标识符<span class="number">3</span></span><br></pre></td></tr></table></figure>
-<p><code>3&lt;&gt;filename</code> 表示用描述符3打开filename<br><code>3&gt;&amp;-</code> 表示关闭输出描述符的文件</p>
-<p><code>3&lt;&amp;-</code> 表示关闭输入描述符的文件</p>
-<hr>
-<p>参考</p>
-<ol>
-<li>IBM的资料：<a href="https://www.ibm.com/developerworks/cn/linux/l-iotips/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/linux/l-iotips/index.html</a></li>
-<li>不知道这个跟上个是谁抄谁的一部分：<a href="http://manual.51yip.com/shell/io-redirection.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/linux/l-iotips/index.html</a></li>
+        <h1 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1. 介绍"></a>1. 介绍</h1><p>使用特定函数操作不定长列表，初始化——操作——结束。<br><a id="more"></a></p>
+<h1 id="2-具体"><a href="#2-具体" class="headerlink" title="2. 具体"></a>2. 具体</h1><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#include &lt;stdarg.h&gt;</span></span><br><span class="line">void va_start(va_list ap, last);</span><br><span class="line">type va_arg(va_list ap, type);</span><br><span class="line">void va_end(va_list ap);</span><br><span class="line">void va_copy(va_list dest, va_list src);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>va_start()</code>：初始化不定长参数列表类型<code>ap</code>，<code>last</code>是不定长参数<code>...</code>之前挨着的一个已知类型参数。<code>ap</code>是自己声明的一个变量。必须在所有要用到<code>ap</code>的函数之前调用该函数。</li>
+<li><code>va_arg()</code>: 从<code>ap</code>中<strong>依次</strong>取出相应的参数。应用需要从另外的地方知道不定参数的个数，比如<code>printf()</code>中的格式化字符串。如果下一个没有参数了，会返回随机错误。</li>
+<li><code>va_copy()</code>: 将<code>src</code>的不定参数列表复制到<code>dest</code>中，但要注意，不同系统实现方式不同，不要直接自己去操作<code>ap</code>列表，需要调用这些特定函数去操作。</li>
+<li><code>va_end()</code>：最后结束了必须要调用这个。可以多次顺序调用<code>va_start()</code>和<code>va_end()</code>，但必须成对儿。</li>
+</ul>
+<p>man给出的例子:<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdarg.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span></span><br><span class="line">foo(<span class="keyword">char</span> *fmt, ...)</span><br><span class="line">&#123;</span><br><span class="line">    va_list ap;</span><br><span class="line">    <span class="keyword">int</span> d;</span><br><span class="line">    <span class="keyword">char</span> c, *s;</span><br><span class="line"></span><br><span class="line">    va_start(ap, fmt);</span><br><span class="line">    <span class="keyword">while</span> (*fmt)</span><br><span class="line">        <span class="keyword">switch</span> (*fmt++) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">'s'</span>:              <span class="comment">/* string */</span></span><br><span class="line">            s = va_arg(ap, <span class="keyword">char</span> *);</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"string %s\n"</span>, s);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">'d'</span>:              <span class="comment">/* int */</span></span><br><span class="line">            d = va_arg(ap, <span class="keyword">int</span>);</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"int %d\n"</span>, d);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">'c'</span>:              <span class="comment">/* char */</span></span><br><span class="line">            <span class="comment">/* need a cast here since va_arg only</span></span><br><span class="line"><span class="comment">                takes fully promoted types */</span></span><br><span class="line">            c = (<span class="keyword">char</span>) va_arg(ap, <span class="keyword">int</span>);</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"char %c\n"</span>, c);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    va_end(ap);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="3-参考"><a href="#3-参考" class="headerlink" title="3. 参考"></a>3. 参考</h1><ol>
+<li>linux man手册</li>
 </ol>
 
       
@@ -464,7 +443,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="/2017/09/22/shell IO重定向/" title="shell IO重定向">2017/09/22/shell IO重定向/</a>
+    <a href="/2020/03/20/不定长参数/" title="不定长参数">2020/03/20/不定长参数/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权： </strong>
@@ -476,7 +455,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/linux/" rel="tag"># linux</a>
+            <a href="/tags/c/" rel="tag"># c</a>
           
         </div>
       
@@ -489,8 +468,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/09/20/命令_date/" rel="next" title="命令_date">
-                <i class="fa fa-chevron-left"></i> 命令_date
+              <a href="/2020/03/20/PSK相关/" rel="next" title="PSK相关">
+                <i class="fa fa-chevron-left"></i> PSK相关
               </a>
             
           </div>
@@ -498,10 +477,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/09/22/命令-nc/" rel="prev" title="命令_nc">
-                命令_nc <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -546,8 +521,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
             
@@ -649,6 +633,23 @@
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-介绍"><span class="nav-text">1. 介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-具体"><span class="nav-text">2. 具体</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-参考"><span class="nav-text">3. 参考</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
