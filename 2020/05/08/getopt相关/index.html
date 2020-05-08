@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":"flase","async":true,"transition":{"post_block":"fadeIn","post_header":"fadeIn","post_body":"fadeIn","coll_header":"fadeIn","sidebar":"fadeIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1. C解析命令行的。">
+<meta name="keywords" content="c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="getopt相关">
+<meta property="og:url" content="http://suntus.github.io/2020/05/08/getopt相关/index.html">
+<meta property="og:site_name" content="Morning~Sun。">
+<meta property="og:description" content="1. C解析命令行的。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-05-08T13:42:00.079Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="getopt相关">
+<meta name="twitter:description" content="1. C解析命令行的。">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Morning~Sun。" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://suntus.github.io/2020/05/08/getopt相关/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>getopt相关 | Morning~Sun。</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-55322469-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-55322469-1');
+  </script>
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Morning~Sun。</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">ha</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://suntus.github.io/2020/05/08/getopt相关/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="suntus">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Morning~Sun。">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">getopt相关
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-05-08 21:39 21:39:06" itemprop="dateCreated datePublished" datetime="2020-05-08T21:39:06+08:00">2020-05-08 21:39</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-05-08 21:42 21:42:00" itemprop="dateModified" datetime="2020-05-08T21:42:00+08:00">2020-05-08 21:42</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-C解析命令行的。"><a href="#1-C解析命令行的。" class="headerlink" title="1. C解析命令行的。"></a>1. C解析命令行的。</h1><a id="more"></a>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getopt</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> * <span class="keyword">const</span> argv[],</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">const</span> <span class="keyword">char</span> *optstring)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">char</span> *optarg;</span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">int</span> optind, opterr, optopt;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;getopt.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">option</span> &#123;</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *name;</span><br><span class="line">    <span class="keyword">int</span>         has_arg;</span><br><span class="line">    <span class="keyword">int</span>        *flag;</span><br><span class="line">    <span class="keyword">int</span>         val;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getopt_long</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> * <span class="keyword">const</span> argv[],</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">const</span> <span class="keyword">char</span> *optstring,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">const</span> struct option *longopts, <span class="keyword">int</span> *longindex)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getopt_long_only</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> * <span class="keyword">const</span> argv[],</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">const</span> <span class="keyword">char</span> *optstring,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">const</span> struct option *longopts, <span class="keyword">int</span> *longindex)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getsubopt</span><span class="params">(<span class="keyword">char</span> **optionp, <span class="keyword">char</span> * <span class="keyword">const</span> *tokens, <span class="keyword">char</span> **valuep)</span></span>;</span><br></pre></td></tr></table></figure>
+<h1 id="2-短选项以-39-39-开头，长选项以-quot-quot-开头。"><a href="#2-短选项以-39-39-开头，长选项以-quot-quot-开头。" class="headerlink" title="2. 短选项以&#39;-&#39;开头，长选项以&quot;--&quot;开头。"></a>2. 短选项以<code>&#39;-&#39;</code>开头，长选项以<code>&quot;--&quot;</code>开头。</h1><h1 id="3-getopt-的使用："><a href="#3-getopt-的使用：" class="headerlink" title="3. getopt()的使用："></a>3. <code>getopt()</code>的使用：</h1><ol>
+<li>只接受短选项；</li>
+<li><em><code>argc</code></em> 和 <em><code>argv</code></em> 都是<code>main()</code>传进去的参数。</li>
+<li><em><code>optstring</code></em> 是要解析哪些命令行选项。短选项都是一个字符(一般是字母)，字符后不带<code>&#39;:&#39;</code>，说明该选项不要参数；带1个<code>&#39;:&#39;</code>,说明强制要求参数；带2个<code>&quot;::&quot;</code>，表示可选参数，如果携带参数，需要紧跟着选项，比如这样<code>-oarg</code>,不能是这样<code>-o arg</code>(强制参数的可以是这样)；GNU有个扩展，<code>-W foo</code>相当于长选项<code>--foo</code>，所以设置选项字符的时候别用<code>W</code>；</li>
+<li><em><code>optind</code></em> 指向下一个要解析的选项，初始化设为1，用户可以重新设置，让<code>getopt()</code>重新开始解析；</li>
+<li>解析命令行的时候，需要多次调用<code>getopt()</code>;</li>
+<li>解析到一个选项，<code>getopt()</code>返回该选项字符，并将 <em><code>optind</code></em> 置为下一个要解析的选项；如果该选项带强制参数，<em><code>optarg</code></em>指向该强制参数；如果该选项有可选参数，且命令行中有参数，<em><code>optarg</code></em>指向该参数，如果命令行没参数，<em><code>optarg</code></em>指向NULL;</li>
+<li>全部解析完参数，<code>getopt()</code>返回-1, <em><code>optind</code></em> 会指向第一个不是选项的参数；</li>
+<li><code>getopt()</code>会在解析参数时对参数列表重新排序，让不是选项的参数排到最后。还有另外两种工作模式，1)选项字符串以<code>+</code>开头，或者设置了<code>POSIXLY_CORRECT</code>环境变量，会让<code>getopt()</code>在遇到不是选项的参数就退出；2)选项字符串以<code>-</code>开头，会将所有不是选项的参数都当成是选项字符<code>1</code>的参数，这样可以保证所有的参数都是按顺序解析；</li>
+<li>特殊的选项<code>--</code>会强制让<code>getopt()</code>中止解析，不管哪种工作模式都适用;</li>
+<li>遇到不认识的选项，<code>getopt()</code>会打印出错信息，并将该选项字符放到<code>opterr</code>中，然后返回<code>&#39;?&#39;</code>; 用户在调用<code>getopt()</code>之前将<code>opterr</code>设为0，可以屏蔽该错误信息；</li>
+<li>遇到不认识的选项，或者选项缺少参数时，<code>getopt()</code>返回<code>&#39;?&#39;</code>; 如果选项字符串第一个字符是<code>&#39;:&#39;</code>(跟在<code>&#39;+&#39;, &#39;-&#39;</code>之后)，选项缺少参数时，会返回<code>&#39;:&#39;</code>而不是<code>&#39;?&#39;</code>。</li>
+</ol>
+<h1 id="4-getopt-long-的使用："><a href="#4-getopt-long-的使用：" class="headerlink" title="4. getopt_long()的使用："></a>4. <code>getopt_long()</code>的使用：</h1><ol>
+<li>可以额外接受长选项；</li>
+<li>短选项还在<code>optstring</code>定义，长选项使用<code>longopts</code>定义；</li>
+<li>多了两个参数;</li>
+<li>其中<code>struct option</code>的各个字段为: 1) <code>name</code>该长选项的名字，就是命令行输入的时候的<code>--name</code>，2) <code>has_arg</code>有3个值：<code>no_argument(0)</code>表示没参数，<code>required_argument(1)</code>表示强制要求参数,<code>optional_argument(2)</code>表示可选参数; 3) <code>flag</code>是配合<code>val</code>使用的，下面说；</li>
+<li>如果<code>flag</code>为NULL, <code>getopt_long()</code>返回<code>val</code>；如果<code>flag</code>不为NULL，<code>getopt_long()</code>返回0，然后<code>flag</code>会指向<code>val</code>的值。就是长选项的参数解析可以放到最外层的<code>switch</code>进行，也可以在<code>case 0:</code>中，使用<code>switch(*flag)</code>去解析。</li>
+<li><code>struct option *longopts</code>是个数组，最后一个元素必须填充0,</li>
+<li><code>longindex</code>指向当前解析的第几个<code>longopts</code>选项，可以使用<code>longopts[*longindex]</code>得到相应的数组；</li>
+</ol>
+<h1 id="5-getsubopt-的使用"><a href="#5-getsubopt-的使用" class="headerlink" title="5. getsubopt()的使用:"></a>5. <code>getsubopt()</code>的使用:</h1><ol>
+<li>解析逗号分割的次级选项，比如这样的<code>&quot;-o rw,name=xyz&quot;</code>;</li>
+<li><code>optionp</code>是待解析的选项列表, <code>tokens</code>是可以解析哪些选项，就是<code>rw</code>, <code>name</code>这种，<code>valuep</code>就是解析出来的值，比如<code>xyz</code>这种；</li>
+<li><code>getsubopt()</code>返回的就是<code>tokens</code>的索引，<code>tokens</code>是类似这样定义:<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *<span class="keyword">const</span> token[] = &#123;</span><br><span class="line">    [<span class="meta">RO_OPT</span>]   = <span class="string">"ro"</span>,</span><br><span class="line">    [<span class="meta">RW_OPT</span>]   = <span class="string">"rw"</span>,</span><br><span class="line">    [<span class="meta">NAME_OPT</span>] = <span class="string">"name"</span>,</span><br><span class="line">    NULL</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="6-参考"><a href="#6-参考" class="headerlink" title="6. 参考"></a>6. 参考</h1><ol>
+<li>man 3 getopt</li>
+<li>man 3 getsubopt</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+    <div>
+ 
+ 
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+      <strong>本文作者：</strong>suntus
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="/2020/05/08/getopt相关/" title="getopt相关">2020/05/08/getopt相关/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权： </strong>
+    本站文章均采用 <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0 CN</a> 许可协议，请勿用于商业，转载注明出处！
+  </li>
+</ul>
+
+</div>
+      
+        <div class="post-tags">
+          
+            <a href="/tags/c/" rel="tag"># c</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/24/printf族/" rel="next" title="printf族">
+                <i class="fa fa-chevron-left"></i> printf族
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">suntus</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">90</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-C解析命令行的。"><span class="nav-text">1. C解析命令行的。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-短选项以-39-39-开头，长选项以-quot-quot-开头。"><span class="nav-text">2. 短选项以&#39;-&#39;开头，长选项以&quot;--&quot;开头。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-getopt-的使用："><span class="nav-text">3. getopt()的使用：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-getopt-long-的使用："><span class="nav-text">4. getopt_long()的使用：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-getsubopt-的使用"><span class="nav-text">5. getsubopt()的使用:</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-参考"><span class="nav-text">6. 参考</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">suntus</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
